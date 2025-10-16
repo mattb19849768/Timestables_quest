@@ -1,168 +1,397 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+  // === CANVASES ===
+  const bgCanvas = document.getElementById("bgCanvas");
+  const confCanvas = document.getElementById("confettiCanvas");
+  const fireCanvas = document.getElementById("fireworksCanvas");
+  const bctx = bgCanvas.getContext("2d");
+  const confCtx = confCanvas.getContext("2d");
+  const fireCtx = fireCanvas.getContext("2d");
 
-  const bgCanvas=document.getElementById('bgCanvas'), bgCtx=bgCanvas.getContext('2d');
-  const confCanvas=document.getElementById('confettiCanvas'), confCtx=confCanvas.getContext('2d');
-  const fireCanvas=document.getElementById('fireworksCanvas'), fireCtx=fireCanvas.getContext('2d');
+  function resize() {
+    [bgCanvas, confCanvas, fireCanvas].forEach((c) => {
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+    });
+  }
+  window.addEventListener("resize", resize);
+  resize();
 
-  function resizeCanvas(){[bgCanvas,confCanvas,fireCanvas].forEach(c=>{c.width=window.innerWidth;c.height=window.innerHeight;});}
-  window.addEventListener('resize',resizeCanvas); resizeCanvas();
+  // === ELEMENTS ===
+  const statPage = document.getElementById("statPage");
+  const gamePage = document.getElementById("gamePage");
+  const countdownOverlay = document.getElementById("countdownOverlay");
+  const countdownText = document.getElementById("countdownText");
+  const rocketSVG = document.getElementById("rocketSVG");
 
-  // Players and avatars
-  let players=[], activePlayer=null, selectedAvatar=null;
-  const playerSelect=document.getElementById('playerSelect'), scoreboard=document.getElementById('scoreboard'), avatarPicker=document.getElementById('avatarPicker');
-  const avatarList=['🚀','🛸','🌟','🌙','🪐','✨'];
-  avatarList.forEach(a=>{const d=document.createElement('div'); d.className='avatar-choice'; d.textContent=a;
-    d.addEventListener('click',()=>{
-      selectedAvatar=a;
-      document.querySelectorAll('.avatar-choice').forEach(c=>c.classList.remove('selected'));
-      d.classList.add('selected');
-    }); avatarPicker.appendChild(d);
+  const playerSelect = document.getElementById("playerSelect");
+  const newPlayer = document.getElementById("newPlayer");
+  const addPlayerBtn = document.getElementById("addPlayerBtn");
+  const avatarPicker = document.getElementById("avatarPicker");
+  const tableList = document.getElementById("tableList");
+  const startBtn = document.getElementById("startBtn");
+  const mcToggle = document.getElementById("mcToggle");
+  const newMissionBtn = document.getElementById("newMissionBtn");
+  const muteBtn = document.getElementById("muteBtn");
+
+  const activePlayerLabel = document.getElementById("activePlayerLabel");
+  const scoreDisplay = document.getElementById("scoreDisplay");
+  const streakDisplay = document.getElementById("streakDisplay");
+  const timeDisplay = document.getElementById("timeDisplay");
+  const qnumDisplay = document.getElementById("qnumDisplay");
+  const qText = document.getElementById("questionText");
+  const answersContainer = document.getElementById("answersContainer");
+  const answerInput = document.getElementById("answerInput");
+  const submitBtn = document.getElementById("submitBtn");
+  const feedback = document.getElementById("feedback");
+
+  // === STATE ===
+  let players = JSON.parse(localStorage.getItem("ttPlayers") || "[]");
+  let activePlayer = null;
+  let selectedAvatar = "🧑‍🚀";
+  let selectedTables = [];
+  let questions = [];
+  let currentQ = 0;
+  let score = 0;
+  let streak = 0;
+  let timer;
+  let time = 0;
+  let mode = "practice";
+  let multipleChoice = false;
+
+  // === SOUND ENGINE ===
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioCtx();
+  let muted = false;
+
+  const sounds = {
+    ambientOsc: null,
+    rumbleOsc: null,
+    sparkle: (pitch = 800) => {
+      if (muted) return;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = "sine";
+      o.frequency.value = pitch;
+      g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      o.connect(g).connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + 0.4);
+    },
+  };
+
+  function playAmbient() {
+    if (muted) return;
+    if (sounds.ambientOsc) return; // already playing
+    const o1 = audioCtx.createOscillator();
+    const o2 = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o1.type = "sine";
+    o2.type = "triangle";
+    o1.frequency.value = 110;
+    o2.frequency.value = 220;
+    g.gain.value = 0.05;
+    o1.connect(g);
+    o2.connect(g);
+    g.connect(audioCtx.destination);
+    o1.start();
+    o2.start();
+    sounds.ambientOsc = { o1, o2, g };
+  }
+
+  function stopAmbient() {
+    if (sounds.ambientOsc) {
+      sounds.ambientOsc.o1.stop();
+      sounds.ambientOsc.o2.stop();
+      sounds.ambientOsc = null;
+    }
+  }
+
+  function playRumble() {
+    if (muted) return;
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+    const whiteNoise = audioCtx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 80;
+
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0.4;
+
+    whiteNoise.connect(filter).connect(gainNode).connect(audioCtx.destination);
+    whiteNoise.start();
+    whiteNoise.stop(audioCtx.currentTime + 3);
+  }
+
+  muteBtn.addEventListener("click", () => {
+    muted = !muted;
+    muteBtn.textContent = muted ? "🔇" : "🔊";
+    if (muted) stopAmbient();
+    else playAmbient();
   });
 
-  document.getElementById('addPlayerBtn').addEventListener('click',()=>{
-    const name=document.getElementById('newPlayer').value.trim();
-    if(!name||!selectedAvatar) return alert('Pick avatar and name');
-    players.push({name,avatar:selectedAvatar,bestPractice:0,bestChaos:0});
-    selectedAvatar=null; document.getElementById('newPlayer').value='';
-    document.querySelectorAll('.avatar-choice').forEach(c=>c.classList.remove('selected'));
-    savePlayers(); updatePlayerSelect();
+  // === BACKGROUND ===
+  const stars = Array.from({ length: 150 }, () => ({
+    x: Math.random() * bgCanvas.width,
+    y: Math.random() * bgCanvas.height,
+    r: Math.random() * 2,
+    s: Math.random() * 0.5 + 0.1,
+  }));
+
+  function drawBG() {
+    bctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    const gradient = bctx.createRadialGradient(
+      bgCanvas.width / 2,
+      bgCanvas.height / 2,
+      0,
+      bgCanvas.width / 2,
+      bgCanvas.height / 2,
+      bgCanvas.width / 1.5
+    );
+    gradient.addColorStop(0, "#050818");
+    gradient.addColorStop(1, "#000010");
+    bctx.fillStyle = gradient;
+    bctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+    // Twinkling stars
+    bctx.fillStyle = "white";
+    stars.forEach((s) => {
+      s.y += s.s;
+      if (s.y > bgCanvas.height) s.y = 0;
+      bctx.globalAlpha = Math.random();
+      bctx.beginPath();
+      bctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      bctx.fill();
+    });
+    bctx.globalAlpha = 1;
+
+    requestAnimationFrame(drawBG);
+  }
+  drawBG();
+
+  // === AVATARS ===
+  const avatars = ["🧑‍🚀", "👩‍🚀", "👽", "🤖", "🪐", "🌕", "🚀"];
+  avatars.forEach((a) => {
+    const div = document.createElement("div");
+    div.className = "avatar-choice";
+    div.textContent = a;
+    div.onclick = () => {
+      selectedAvatar = a;
+      document.querySelectorAll(".avatar-choice").forEach((el) => el.classList.remove("selected"));
+      div.classList.add("selected");
+    };
+    avatarPicker.appendChild(div);
   });
+  avatarPicker.firstChild.classList.add("selected");
 
-  playerSelect.addEventListener('change',()=>{activePlayer=players[playerSelect.value];});
-  function savePlayers(){localStorage.setItem('ttPlayers',JSON.stringify(players));}
-  function loadPlayers(){players=JSON.parse(localStorage.getItem('ttPlayers')||'[]'); updatePlayerSelect();}
-  function updatePlayerSelect(){
-    playerSelect.innerHTML='<option value="">Select Player</option>';
-    players.forEach((p,i)=>playerSelect.innerHTML+=`<option value="${i}">${p.name}</option>`);
-    updateScoreboard();
+  // === PLAYERS ===
+  function updatePlayerList() {
+    playerSelect.innerHTML = "";
+    players.forEach((p, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${p.avatar} ${p.name}`;
+      playerSelect.appendChild(opt);
+    });
   }
-  function updateScoreboard(){scoreboard.innerHTML=players.map(p=>`<div>${p.avatar} ${p.name}: Best Practice ${p.bestPractice||0}, Best Chaos ${p.bestChaos||0}</div>`).join('');}
+  updatePlayerList();
 
-  // Tables
-  const tableList=document.getElementById('tableList');
-  for(let i=2;i<=12;i++){const chip=document.createElement('div'); chip.className='table-chip'; chip.textContent=i;
-    chip.addEventListener('click',()=>chip.classList.toggle('selected')); tableList.appendChild(chip);
-  }
+  addPlayerBtn.onclick = () => {
+    const name = newPlayer.value.trim();
+    if (!name) return;
+    players.push({ name, avatar: selectedAvatar, bestPractice: 0, bestChaos: 0 });
+    newPlayer.value = "";
+    localStorage.setItem("ttPlayers", JSON.stringify(players));
+    updatePlayerList();
+  };
 
-  // Game Variables
-  let tables=[], questions=[], currentQ=0, score=0, streak=0, mode='practice', multipleChoice=false;
-  let timerInterval=0, startTime=0;
-
-  // Timer
-  function startTimer(){startTime=Date.now(); timerInterval=setInterval(()=>{const elapsed=Date.now()-startTime; const m=Math.floor(elapsed/60000).toString().padStart(2,'0'); const s=Math.floor((elapsed%60000)/1000).toString().padStart(2,'0'); document.getElementById('timeDisplay').textContent=`${m}:${s}`;},500);}
-  function stopTimer(){clearInterval(timerInterval);}
-
-  // Elements
-  const statPage=document.getElementById('statPage'), gamePage=document.getElementById('gamePage');
-  const startBtn=document.getElementById('startBtn'), activePlayerLabel=document.getElementById('activePlayerLabel');
-  const scoreDisplay=document.getElementById('scoreDisplay'), streakDisplay=document.getElementById('streakDisplay');
-  const qnumDisplay=document.getElementById('qnumDisplay'), answersContainer=document.getElementById('answersContainer');
-  const feedback=document.getElementById('feedback'), answerInput=document.getElementById('answerInput'), submitBtn=document.getElementById('submitBtn');
-  const countdownOverlay=document.getElementById('countdownOverlay'), countdownText=document.getElementById('countdownText'), rocketSVG=document.getElementById('rocketSVG');
-
-  document.getElementById('newMissionBtn').addEventListener('click',()=>{gamePage.classList.add('hidden'); statPage.classList.remove('hidden'); stopTimer();});
-  document.getElementById('playAgainBtn').addEventListener('click',startGame);
-
-  startBtn.addEventListener('click',startGame);
-
-  function startGame(){
-    if(!activePlayer) return alert('Select player');
-    tables=[]; document.querySelectorAll('.table-chip.selected').forEach(c=>tables.push(parseInt(c.textContent)));
-    if(tables.length===0) return alert('Select at least one table');
-    mode=document.querySelector('input[name="mode"]:checked').value; multipleChoice=document.getElementById('mcToggle').checked;
-    score=0; streak=0; currentQ=0; activePlayerLabel.textContent=activePlayer.name;
-    scoreDisplay.textContent=0; streakDisplay.textContent=0; qnumDisplay.textContent=0;
-    document.getElementById('timeDisplay').textContent='00:00';
-    generateQuestions(); statPage.classList.add('hidden'); gamePage.classList.remove('hidden'); runCountdown();
+  // === TABLE SELECT ===
+  for (let i = 1; i <= 12; i++) {
+    const chip = document.createElement("div");
+    chip.className = "table-chip";
+    chip.textContent = i;
+    chip.onclick = () => chip.classList.toggle("selected");
+    tableList.appendChild(chip);
   }
 
-  function generateQuestions(){
-    questions=[];
-    if(mode==='chaos'){for(let i=0;i<50;i++){const t=tables[Math.floor(Math.random()*tables.length)]; questions.push({a:t,b:Math.ceil(Math.random()*12)});}}
-    else{tables.forEach(t=>{for(let i=1;i<=12;i++){questions.push({a:t,b:i});}});}
-    shuffleArray(questions);
+  // === GAME LOGIC ===
+  startBtn.onclick = () => {
+    const idx = playerSelect.value;
+    if (idx === "" || idx === null) return alert("Select or create a player");
+    activePlayer = players[idx];
+    activePlayerLabel.textContent = `${activePlayer.avatar} ${activePlayer.name}`;
+    mode = document.querySelector('input[name="mode"]:checked').value;
+    multipleChoice = mcToggle.checked;
+
+    selectedTables = Array.from(document.querySelectorAll(".table-chip.selected")).map((el) => parseInt(el.textContent));
+    if (selectedTables.length === 0) return alert("Select at least one table!");
+
+    statPage.classList.add("hidden");
+    countdownOverlay.classList.remove("hidden");
+    playAmbient();
+    playRumble();
+    startCountdown();
+  };
+
+  newMissionBtn.onclick = () => {
+    gamePage.classList.add("hidden");
+    statPage.classList.remove("hidden");
+  };
+
+  function startCountdown() {
+    let count = 3;
+    countdownText.textContent = count;
+    const interval = setInterval(() => {
+      count--;
+      if (count === 0) {
+        countdownText.textContent = "🚀";
+        launchRocket();
+      } else if (count < 0) {
+        clearInterval(interval);
+        countdownOverlay.classList.add("hidden");
+        startGame();
+      } else countdownText.textContent = count;
+    }, 1000);
   }
 
-  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}}
-
-  // Countdown & Rocket
-  function runCountdown(){
-    countdownOverlay.classList.remove('hidden');
-    let count=3; rocketSVG.style.transform='translateY(0) rotate(0deg)'; animateRocketShake();
-    const interval=setInterval(()=>{
-      if(count>0){countdownText.textContent=count; playTone(440+count*100,0.2);}
-      else{countdownText.textContent='Blast Off!'; playTone(880,0.4); launchRocket(); startTimer();}
-      count--; if(count<-1){clearInterval(interval); countdownOverlay.classList.add('hidden'); showQuestion();}
-    },800);
+  function launchRocket() {
+    let y = 0;
+    const flame = rocketSVG.querySelector("#flame");
+    const flameParticles = [];
+    const anim = setInterval(() => {
+      y -= 10;
+      rocketSVG.style.transform = `translateY(${y}px)`;
+      flame.setAttribute("points", `40,130 48,${150 + Math.random() * 10} 40,140 32,${150 + Math.random() * 10}`);
+      if (y < -window.innerHeight) clearInterval(anim);
+    }, 30);
   }
 
-  function animateRocketShake(){let t=0; const shake=setInterval(()=>{t++; rocketSVG.style.transform=`translateY(${Math.sin(t*0.5)*2}px) rotate(${Math.sin(t*0.3)*2}deg)`; if(t>20) clearInterval(shake);},50);}
-
-  function launchRocket(){
-    let y=0; const flame=rocketSVG.querySelector('#flame'); const flameParticles=[];
-    const anim=setInterval(()=>{
-      y-=10; rocketSVG.style.transform=`translateY(${y}px)`;
-      flame.setAttribute('points',`40,110 48,${150+Math.random()*10} 40,140 32,${150+Math.random()*10}`);
-      flameParticles.push({x:40,y:110-y,size:Math.random()*6+3,alpha:1});
-      fireCtx.clearRect(0,0,fireCanvas.width,fireCanvas.height);
-      flameParticles.forEach(p=>{fireCtx.fillStyle=`rgba(255,200,50,${p.alpha})`; fireCtx.beginPath(); fireCtx.arc(window.innerWidth/2+(p.x-40),fireCanvas.height-p.y,p.size,0,Math.PI*2); fireCtx.fill(); p.alpha-=0.03; p.size*=0.95;});
-      for(let i=flameParticles.length-1;i>=0;i--) if(flameParticles[i].alpha<=0) flameParticles.splice(i,1);
-      if(y<-window.innerHeight) clearInterval(anim);
-    },30);
+  // === QUESTION GENERATION ===
+  function generateQuestions() {
+    const qs = [];
+    if (mode === "practice") {
+      selectedTables.forEach((t) => {
+        for (let i = 1; i <= 12; i++) qs.push({ a: t, b: i });
+      });
+    } else {
+      for (let i = 0; i < 50; i++) qs.push({ a: Math.ceil(Math.random() * 12), b: Math.ceil(Math.random() * 12) });
+    }
+    return qs.sort(() => Math.random() - 0.5);
   }
 
-  // Show questions
-  function showQuestion(){
-    if(currentQ>=questions.length){endGame(); return;}
-    const q=questions[currentQ]; document.getElementById('questionText').textContent=`${q.a} × ${q.b} = ?`;
-    if(multipleChoice){
-      answersContainer.innerHTML=''; const correct=q.a*q.b; const options=[correct];
-      while(options.length<4){const o=Math.floor(Math.random()*12*q.a)+1; if(!options.includes(o)) options.push(o);}
-      shuffleArray(options);
-      options.forEach(o=>{const btn=document.createElement('button'); btn.className='answer-btn'; btn.textContent=o; btn.addEventListener('click',()=>{checkAnswer(o);}); answersContainer.appendChild(btn);});
-      answerInput.parentElement.style.display='none';
-    } else {answersContainer.innerHTML=''; answerInput.value=''; answerInput.parentElement.style.display='flex'; answerInput.focus();}
-    qnumDisplay.textContent=currentQ+1;
+  function startGame() {
+    questions = generateQuestions();
+    currentQ = 0;
+    score = 0;
+    streak = 0;
+    time = 0;
+    updateTimer();
+    gamePage.classList.remove("hidden");
+    showQuestion();
   }
 
-  submitBtn.addEventListener('click',()=>checkAnswer(parseInt(answerInput.value)));
-  answerInput.addEventListener('keydown',(e)=>{if(e.key==='Enter') submitBtn.click();});
-
-  function checkAnswer(ans){
-    const q=questions[currentQ]; const correct=q.a*q.b;
-    if(ans===correct){score++; streak++; feedback.textContent='Correct!'; feedback.className='feedback good'; playTone(1200,0.1); launchConfetti();}
-    else{streak=0; feedback.textContent=`Wrong (${correct})`; feedback.className='feedback bad'; playTone(200,0.1);}
-    scoreDisplay.textContent=score; streakDisplay.textContent=streak; currentQ++;
-    setTimeout(showQuestion,600);
+  function updateTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      time++;
+      const m = String(Math.floor(time / 60)).padStart(2, "0");
+      const s = String(time % 60).padStart(2, "0");
+      timeDisplay.textContent = `${m}:${s}`;
+    }, 1000);
   }
 
-  function endGame(){feedback.textContent=`Mission Complete! Score: ${score}`; stopTimer();
-    if(mode==='practice'&&score>activePlayer.bestPractice) activePlayer.bestPractice=score;
-    if(mode==='chaos'&&score>activePlayer.bestChaos) activePlayer.bestChaos=score;
-    savePlayers(); updateScoreboard();
+  function showQuestion() {
+    if (currentQ >= questions.length) return endGame();
+    const q = questions[currentQ];
+    qText.textContent = `${q.a} × ${q.b} = ?`;
+    feedback.textContent = "";
+
+    if (multipleChoice) {
+      answersContainer.innerHTML = "";
+      const correct = q.a * q.b;
+      const opts = [correct];
+      while (opts.length < 4) {
+        const o = Math.ceil(Math.random() * 12 * q.a);
+        if (!opts.includes(o)) opts.push(o);
+      }
+      opts.sort(() => Math.random() - 0.5);
+      opts.forEach((o) => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = o;
+        btn.onclick = () => checkAnswer(o);
+        answersContainer.appendChild(btn);
+      });
+      document.getElementById("typedAnswer").style.display = "none";
+    } else {
+      answersContainer.innerHTML = "";
+      document.getElementById("typedAnswer").style.display = "flex";
+      answerInput.value = "";
+      answerInput.focus();
+    }
   }
 
-  function playTone(freq,dur){const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=freq;g.gain.setValueAtTime(0.2,ctx.currentTime);o.start();o.stop(ctx.currentTime+dur);}
+  submitBtn.onclick = () => checkAnswer(parseInt(answerInput.value));
+  answerInput.onkeydown = (e) => {
+    if (e.key === "Enter") submitBtn.click();
+  };
 
-  // Confetti
-  let confettiParticles=[];
-  function launchConfetti(){for(let i=0;i<30;i++){confettiParticles.push({x:Math.random()*confCanvas.width,y:0,vx:(Math.random()-0.5)*2,vy:Math.random()*3+2,color:`hsl(${Math.random()*360},80%,60%)`,size:Math.random()*6+4});}}
-  function updateConfetti(){confCtx.clearRect(0,0,confCanvas.width,confCanvas.height); confettiParticles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy*=0.99;p.vy+=0.05; confCtx.fillStyle=p.color; confCtx.fillRect(p.x,p.y,p.size,p.size);}); confettiParticles=confettiParticles.filter(p=>p.y<confCanvas.height+10); requestAnimationFrame(updateConfetti);}
-  updateConfetti();
-
-  // Starfield
-  const stars=[], planets=[], asteroids=[];
-  for(let i=0;i<250;i++) stars.push({x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*1.5+0.5,twinkle:Math.random()*0.05});
-  for(let i=0;i<5;i++) planets.push({x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*50+30,speed:Math.random()*0.2+0.05,color:`hsl(${Math.random()*360},70%,60%)`}));
-  for(let i=0;i<30;i++) asteroids.push({x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,r:Math.random()*6+3,vx:(Math.random()-0.5)*1,vy:Math.random()*0.5+0.2,color:`hsl(${Math.random()*60+30},80%,50%)`}));
-
-  function updateStarsPlanets(){bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-    stars.forEach(s=>{s.y+=0.2;if(s.y>bgCanvas.height)s.y=0; bgCtx.fillStyle=`rgba(255,255,255,${0.5+Math.sin(Date.now()*s.twinkle)})`; bgCtx.beginPath(); bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2); bgCtx.fill();});
-    planets.forEach(p=>{p.x+=p.speed;if(p.x>bgCanvas.width+p.r)p.x=-p.r; bgCtx.fillStyle=p.color; bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill();});
-    asteroids.forEach(a=>{a.x+=a.vx;a.y+=a.vy; if(a.y>bgCanvas.height)a.y=-a.r;if(a.x>bgCanvas.width)a.x=0;if(a.x<0)a.x=bgCanvas.width; bgCtx.fillStyle=a.color; bgCtx.beginPath(); bgCtx.arc(a.x,a.y,a.r,0,Math.PI*2); bgCtx.fill();});
-    requestAnimationFrame(updateStarsPlanets);
+  function checkAnswer(ans) {
+    const q = questions[currentQ];
+    const correct = q.a * q.b;
+    if (ans === correct) {
+      score++;
+      streak++;
+      feedback.textContent = "✅ Correct!";
+      feedback.className = "feedback good";
+      sounds.sparkle(600 + Math.random() * 400);
+      confetti();
+    } else {
+      streak = 0;
+      feedback.textContent = `❌ ${correct}`;
+      feedback.className = "feedback bad";
+    }
+    scoreDisplay.textContent = score;
+    streakDisplay.textContent = streak;
+    currentQ++;
+    setTimeout(showQuestion, 600);
   }
-  updateStarsPlanets();
 
-  loadPlayers();
+  function endGame() {
+    clearInterval(timer);
+    feedback.textContent = `🎉 Mission Complete! Score: ${score}`;
+  }
+
+  // === CONFETTI ===
+  let conf = [];
+  function confetti() {
+    for (let i = 0; i < 25; i++) {
+      conf.push({
+        x: Math.random() * confCanvas.width,
+        y: 0,
+        vx: (Math.random() - 0.5) * 3,
+        vy: Math.random() * 4 + 2,
+        c: `hsl(${Math.random() * 360},70%,60%)`,
+        s: Math.random() * 6 + 3,
+      });
+    }
+  }
+  function confUpdate() {
+    confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+    conf.forEach((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      confCtx.fillStyle = p.c;
+      confCtx.fillRect(p.x, p.y, p.s, p.s);
+    });
+    conf = conf.filter((p) => p.y < confCanvas.height);
+    requestAnimationFrame(confUpdate);
+  }
+  confUpdate();
 });

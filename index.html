@@ -1,113 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Times Table Galaxy Quest</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Space Times Table Adventure</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<canvas id="bgCanvas" aria-hidden="true"></canvas>
-<canvas id="confettiCanvas" aria-hidden="true"></canvas>
-<canvas id="fireworksCanvas" aria-hidden="true"></canvas>
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="confettiCanvas"></canvas>
+  <canvas id="fireworksCanvas"></canvas>
 
-<!-- Selection Page -->
-<div id="statPage" class="page">
-  <header>
-    <h1>🚀 Times Table Galaxy Quest</h1>
-  </header>
+  <!-- HOME PAGE -->
+  <div id="statPage" class="page">
+    <h1>🚀 Space Times Table Adventure</h1>
 
-  <section class="player-section">
-    <strong>Players</strong>
-    <div class="new-player-row">
-      <div id="avatarPicker" class="avatar-picker"></div>
-      <input id="newPlayer" placeholder="Enter name">
-      <button id="addPlayerBtn" class="btn">Add Player</button>
+    <div id="playerSection">
+      <label>👨‍🚀 Select Player</label>
+      <select id="playerSelect"></select>
+
+      <label>Create New Player</label>
+      <input type="text" id="newPlayer" placeholder="Enter name" />
+      <div id="avatarPicker"></div>
+      <button id="addPlayerBtn">Add Player</button>
     </div>
-    <div class="select-row">
-      <label for="playerSelect">Active Player</label>
-      <select id="playerSelect">
-        <option value="">Select Player</option>
-      </select>
-    </div>
-    <div class="scoreboard" id="scoreboard"></div>
-  </section>
 
-  <section>
-    <strong>Pick Tables</strong>
-    <div class="tables" id="tableList"></div>
-  </section>
-
-  <section>
-    <strong>Mode & Options</strong>
-    <div class="modes">
-      <label><input type="radio" name="mode" value="practice" checked> Practice</label>
-      <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
+    <div id="modeSection">
+      <h2>Mode</h2>
+      <label><input type="radio" name="mode" value="practice" checked /> Practice</label>
+      <label><input type="radio" name="mode" value="chaos" /> Chaos (50 Random)</label>
+      <label><input type="checkbox" id="mcToggle" /> Multiple Choice</label>
     </div>
-    <div>
-      <label><input type="checkbox" id="mcToggle"> Multiple Choice</label>
-    </div>
-  </section>
 
-  <div class="control-buttons">
-    <button id="startBtn" class="btn">Start Mission</button>
-    <button id="leaderBtn" class="ghost">Leaderboard</button>
-    <button id="resetBtn" class="ghost">Reset Bests</button>
+    <div id="tableSelect">
+      <h2>Select Tables</h2>
+      <div id="tableList"></div>
+    </div>
+
+    <button id="startBtn">Start Mission</button>
+    <div id="scoreboard"></div>
   </div>
-</div>
 
-<!-- Game Page -->
-<div id="gamePage" class="page hidden">
-  <div id="countdownOverlay" class="countdown-overlay hidden">
-    <div id="countdownText"></div>
-    <!-- Upgraded Rocket SVG -->
-    <svg id="rocketSVG" viewBox="0 0 80 160" class="rocket">
-      <polygon points="40,0 50,30 40,24 30,30" fill="#f97316"/>
-      <rect x="32" y="30" width="16" height="80" fill="url(#rocketGrad)"/>
-      <polygon points="40,110 50,140 40,130 30,140" fill="#fb7185"/>
+  <!-- GAME PAGE -->
+  <div id="gamePage" class="page hidden">
+    <div id="topPanel">
+      <div>🧑‍🚀 <span id="activePlayerLabel"></span></div>
+      <div>Score: <span id="scoreDisplay">0</span></div>
+      <div>Streak: <span id="streakDisplay">0</span></div>
+      <div>⏱️ <span id="timeDisplay">00:00</span></div>
+      <button id="muteBtn">🔊</button>
+      <button id="newMissionBtn">New Mission</button>
+    </div>
+
+    <div id="questionPanel">
+      <div id="qnumDisplay">1</div>
+      <div id="questionText" class="question">3 × 4 = ?</div>
+
+      <div id="answersContainer"></div>
+      <div id="typedAnswer">
+        <input type="number" id="answerInput" placeholder="Answer" />
+        <button id="submitBtn">Submit</button>
+      </div>
+      <div id="feedback" class="feedback"></div>
+      <button id="playAgainBtn" class="hidden">Play Again</button>
+    </div>
+  </div>
+
+  <!-- COUNTDOWN OVERLAY -->
+  <div id="countdownOverlay" class="hidden">
+    <div id="countdownText">3</div>
+    <svg id="rocketSVG" viewBox="0 0 80 160">
       <defs>
-        <linearGradient id="rocketGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#a78bfa"/>
-          <stop offset="100%" stop-color="#6366f1"/>
+        <linearGradient id="rocketBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#bbb" />
+          <stop offset="100%" stop-color="#666" />
         </linearGradient>
       </defs>
-      <polygon id="flame" points="40,110 48,150 40,140 32,150" fill="#facc15"/>
+      <polygon points="40,0 60,30 20,30" fill="red" />
+      <rect x="20" y="30" width="40" height="100" fill="url(#rocketBody)" rx="8" />
+      <polygon id="flame" points="40,130 48,150 40,140 32,150" fill="orange" />
+      <rect x="25" y="100" width="10" height="20" fill="#444" />
+      <rect x="45" y="100" width="10" height="20" fill="#444" />
     </svg>
   </div>
 
-  <div class="statusbar">
-    <div>Active: <span id="activePlayerLabel">—</span></div>
-    <div>Score: <span id="scoreDisplay">0</span></div>
-    <div>Streak: <span id="streakDisplay">0</span></div>
-    <div>Q#: <span id="qnumDisplay">0</span></div>
-    <div>Time: <span id="timeDisplay">00:00</span></div>
-  </div>
-
-  <section class="question-area" id="qa">
-    <div class="question" id="questionText">Prepare for launch...</div>
-    <div class="answers" id="answersContainer"></div>
-    <div class="typed-answer" id="typedAnswerRow">
-      <input id="answerInput" placeholder="Type your answer" inputmode="numeric">
-      <button id="submitBtn" class="btn">Submit</button>
-    </div>
-    <div class="feedback" id="feedback"></div>
-  </section>
-
-  <div class="control-buttons">
-    <button id="newMissionBtn" class="btn">New Mission</button>
-    <button id="playAgainBtn" class="btn">Play Again</button>
-  </div>
-</div>
-
-<!-- Leaderboard modal -->
-<div id="leaderModal" class="modal hidden" aria-hidden="true">
-  <div class="modal-content">
-    <button class="modal-close" id="leaderClose">✕</button>
-    <h2>Leaderboard</h2>
-    <div id="leaderList"></div>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
