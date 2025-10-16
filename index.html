@@ -11,7 +11,7 @@
 <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 <canvas id="fireworksCanvas" aria-hidden="true"></canvas>
 
-<!-- Stat / Selection Page -->
+<!-- Selection Page -->
 <div id="statPage" class="page">
   <header>
     <h1>🚀 Times Table Galaxy Quest</h1>
@@ -60,10 +60,18 @@
 <div id="gamePage" class="page hidden">
   <div id="countdownOverlay" class="countdown-overlay hidden">
     <div id="countdownText"></div>
-    <svg id="rocketSVG" viewBox="0 0 64 128" class="rocket">
-      <polygon points="32,0 42,28 32,24 22,28" fill="#f97316"/>
-      <rect x="28" y="28" width="8" height="64" fill="#a78bfa"/>
-      <polygon points="32,92 40,112 32,104 24,112" fill="#fb7185"/>
+    <!-- Upgraded Rocket SVG -->
+    <svg id="rocketSVG" viewBox="0 0 80 160" class="rocket">
+      <polygon points="40,0 50,30 40,24 30,30" fill="#f97316"/>
+      <rect x="32" y="30" width="16" height="80" fill="url(#rocketGrad)"/>
+      <polygon points="40,110 50,140 40,130 30,140" fill="#fb7185"/>
+      <defs>
+        <linearGradient id="rocketGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#a78bfa"/>
+          <stop offset="100%" stop-color="#6366f1"/>
+        </linearGradient>
+      </defs>
+      <polygon id="flame" points="40,110 48,150 40,140 32,150" fill="#facc15"/>
     </svg>
   </div>
 

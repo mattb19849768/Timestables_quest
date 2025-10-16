@@ -11,7 +11,8 @@
 
 *{box-sizing:border-box;}
 body{margin:0;padding:0;background:var(--bg);color:#e6eef8;height:100vh;overflow:hidden;}
-canvas{position:fixed;top:0;left:0;z-index:0;}
+canvas{position:fixed;top:0;left:0;z-index:0;pointer-events:none;}
+
 .page{position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;gap:12px;z-index:10;}
 .hidden{display:none !important;}
 
@@ -23,22 +24,16 @@ header h1{text-align:center;margin:0 0 12px 0;font-size:28px;}
 .avatar-choice.selected{border-color:var(--accent2);transform:translateY(-2px);}
 .scoreboard{display:flex;flex-direction:column;gap:6px;}
 .select-row{display:flex;flex-direction:column;gap:4px;}
+.select-row select#playerSelect{
+  width:180px; max-width:100%; padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:var(--panel); color:#fff; font-size:14px;
+}
+
 .tables{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px;}
 .table-chip{
-  padding:8px;
-  text-align:center;
-  border-radius:8px;
-  cursor:pointer;
-  border:1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.05);
-  color:#ffffff;
-  transition:0.2s;
+  padding:8px;text-align:center;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05); color:#ffffff; transition:0.2s;
 }
-.table-chip.selected{
-  background:linear-gradient(90deg,var(--accent1),var(--accent2));
-  color:#021226;
-  font-weight:700;
-}
+.table-chip.selected{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#021226; font-weight:700;}
 .table-chip:hover{background:rgba(255,255,255,0.15);}
 
 .control-buttons{display:flex;gap:8px;margin-top:12px;}
@@ -47,7 +42,7 @@ header h1{text-align:center;margin:0 0 12px 0;font-size:28px;}
 
 .statusbar{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;font-size:14px;margin-bottom:6px;color:var(--muted);}
 .question-area{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;}
-.question{font-size:48px;font-weight:800;}
+.question{font-size:48px;font-weight:800;text-align:center;}
 .answers{display:flex;flex-wrap:wrap;gap:10px;}
 .answer-btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700;background:rgba(255,255,255,0.05);color:#fff;}
 .answer-btn:hover{background:rgba(255,255,255,0.2);}
@@ -57,20 +52,14 @@ header h1{text-align:center;margin:0 0 12px 0;font-size:28px;}
 .feedback.good{color:var(--good);}
 .feedback.bad{color:var(--bad);}
 
-/* Countdown */
+/* Countdown Overlay */
 .countdown-overlay{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:20;
-  background:rgba(0,0,0,0.2);
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;background:rgba(0,0,0,0.2);
 }
 .countdown-overlay.hidden{display:none !important;}
 #countdownText{font-size:96px;font-weight:800;color:#fbbf24;text-shadow:0 0 12px #fff;}
-.rocket{width:64px;height:128px;margin-top:12px;transform-origin:center bottom;}
+.rocket{width:80px;height:160px;margin-top:12px;transform-origin:center bottom;transition:transform 0.1s ease;}
+#flame{transition:all 0.05s linear;}
 
 /* Leaderboard modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:30;pointer-events:auto;}
@@ -78,17 +67,12 @@ header h1{text-align:center;margin:0 0 12px 0;font-size:28px;}
 .modal-content{background:var(--panel);padding:16px;border-radius:12px;min-width:280px;color:#fff;position:relative;}
 .modal-close{position:absolute;top:8px;right:12px;background:transparent;border:none;font-size:18px;cursor:pointer;}
 
-/* STARFIELD PARALLAX */
-#bgCanvas{
-  z-index:0;
-  display:block;
-}
+/* STARFIELD, PLANETS, ASTEROIDS */
+#bgCanvas{z-index:0;display:block;}
+#confettiCanvas,#fireworksCanvas{pointer-events:none;z-index:5;}
 
-/* CONFETTI & FIREWORKS */
-#confettiCanvas,#fireworksCanvas{
-  pointer-events:none;
-  z-index:5;
-}
+/* PLANETS */
+.planet{position:absolute;border-radius:50%;pointer-events:none;}
 
 /* RESPONSIVE TEXT */
 @media (max-width:768px){
