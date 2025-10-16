@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Times Table Galaxy Quest</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+<canvas id="confettiCanvas" aria-hidden="true"></canvas>
+<canvas id="fireworksCanvas" aria-hidden="true"></canvas>
+
+<!-- Stat / Selection Page -->
+<div id="statPage" class="page">
+  <header>
+    <h1>🚀 Times Table Galaxy Quest</h1>
+  </header>
+
+  <section class="player-section">
+    <strong>Players</strong>
+    <div class="new-player-row">
+      <div id="avatarPicker" class="avatar-picker"></div>
+      <input id="newPlayer" placeholder="Enter name">
+      <button id="addPlayerBtn" class="btn">Add Player</button>
+    </div>
+    <div class="select-row">
+      <label for="playerSelect">Active Player</label>
+      <select id="playerSelect">
+        <option value="">Select Player</option>
+      </select>
+    </div>
+    <div class="scoreboard" id="scoreboard"></div>
+  </section>
+
+  <section>
+    <strong>Pick Tables</strong>
+    <div class="tables" id="tableList"></div>
+  </section>
+
+  <section>
+    <strong>Mode & Options</strong>
+    <div class="modes">
+      <label><input type="radio" name="mode" value="practice" checked> Practice</label>
+      <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
+    </div>
+    <div>
+      <label><input type="checkbox" id="mcToggle"> Multiple Choice</label>
+    </div>
+  </section>
+
+  <div class="control-buttons">
+    <button id="startBtn" class="btn">Start Mission</button>
+    <button id="leaderBtn" class="ghost">Leaderboard</button>
+    <button id="resetBtn" class="ghost">Reset Bests</button>
+  </div>
+</div>
+
+<!-- Game Page -->
+<div id="gamePage" class="page hidden">
+  <div id="countdownOverlay" class="countdown-overlay">
+    <div id="countdownText"></div>
+    <svg id="rocketSVG" viewBox="0 0 64 128" class="rocket">
+      <polygon points="32,0 42,28 32,24 22,28" fill="#f97316"/>
+      <rect x="28" y="28" width="8" height="64" fill="#a78bfa"/>
+      <polygon points="32,92 40,112 32,104 24,112" fill="#fb7185"/>
+    </svg>
+    <div id="trailContainer"></div>
+  </div>
+
+  <div class="statusbar">
+    <div>Active: <span id="activePlayerLabel">—</span></div>
+    <div>Score: <span id="scoreDisplay">0</span></div>
+    <div>Streak: <span id="streakDisplay">0</span></div>
+    <div>Q#: <span id="qnumDisplay">0</span></div>
+    <div>Time: <span id="timeDisplay">00:00</span></div>
+  </div>
+
+  <section class="question-area" id="qa">
+    <div class="question" id="questionText">Prepare for launch...</div>
+    <div class="answers" id="answersContainer"></div>
+    <div class="typed-answer" id="typedAnswerRow">
+      <input id="answerInput" placeholder="Type your answer" inputmode="numeric">
+      <button id="submitBtn" class="btn">Submit</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </section>
+
+  <div class="control-buttons">
+    <button id="newMissionBtn" class="btn">New Mission</button>
+    <button id="playAgainBtn" class="btn">Play Again</button>
+  </div>
+</div>
+
+<!-- Leaderboard modal -->
+<div id="leaderModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <button class="modal-close" id="leaderClose">✕</button>
+    <h2>Leaderboard</h2>
+    <div id="leaderList"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
