@@ -66,18 +66,30 @@
 <!-- COUNTDOWN OVERLAY -->
 <div id="countdownOverlay" class="hidden">
   <div id="countdownText">3</div>
-  <svg id="rocketSVG" viewBox="0 0 80 160">
+  <svg id="rocketSVG" viewBox="0 0 80 160" width="100">
     <defs>
-      <linearGradient id="rocketBody" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#bbb" />
-        <stop offset="100%" stop-color="#666" />
+      <linearGradient id="rocketBodyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#bbb"/>
+        <stop offset="100%" stop-color="#666"/>
+      </linearGradient>
+      <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="yellow"/>
+        <stop offset="1" stop-color="orange"/>
       </linearGradient>
     </defs>
-    <polygon points="40,0 60,30 20,30" fill="red" />
-    <rect x="20" y="30" width="40" height="100" fill="url(#rocketBody)" rx="8" />
-    <polygon id="flame" points="40,130 48,150 40,140 32,150" fill="orange" />
-    <rect x="25" y="100" width="10" height="20" fill="#444" />
-    <rect x="45" y="100" width="10" height="20" fill="#444" />
+    <!-- Nose cone -->
+    <polygon points="40,0 60,30 20,30" fill="red"/>
+    <!-- Body -->
+    <rect x="20" y="30" width="40" height="100" fill="url(#rocketBodyGrad)" rx="8"/>
+    <!-- Fins -->
+    <polygon points="20,120 10,140 20,140" fill="#444"/>
+    <polygon points="60,120 70,140 60,140" fill="#444"/>
+    <!-- Windows -->
+    <circle cx="40" cy="50" r="5" fill="skyblue"/>
+    <circle cx="40" cy="70" r="5" fill="skyblue"/>
+    <circle cx="40" cy="90" r="5" fill="skyblue"/>
+    <!-- Flame -->
+    <polygon id="flame" points="40,130 48,150 40,140 32,150" fill="url(#flameGrad)"/>
   </svg>
 </div>
 
