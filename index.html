@@ -1,89 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Space Times Table Adventure</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Space Times Table Adventure</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <canvas id="bgCanvas"></canvas>
-  <canvas id="confettiCanvas"></canvas>
-  <canvas id="fireworksCanvas"></canvas>
+<canvas id="bgCanvas"></canvas>
+<canvas id="confettiCanvas"></canvas>
+<canvas id="fireworksCanvas"></canvas>
 
-  <!-- HOME PAGE -->
-  <div id="statPage" class="page">
-    <h1>🚀 Space Times Table Adventure</h1>
+<!-- HOME PAGE -->
+<div id="statPage" class="page">
+  <h1>🚀 Space Times Table Adventure</h1>
 
-    <div id="playerSection">
-      <label>👨‍🚀 Select Player</label>
-      <select id="playerSelect"></select>
-
-      <label>Create New Player</label>
-      <input type="text" id="newPlayer" placeholder="Enter name" />
-      <div id="avatarPicker"></div>
-      <button id="addPlayerBtn">Add Player</button>
-    </div>
-
-    <div id="modeSection">
-      <h2>Mode</h2>
-      <label><input type="radio" name="mode" value="practice" checked /> Practice</label>
-      <label><input type="radio" name="mode" value="chaos" /> Chaos (50 Random)</label>
-      <label><input type="checkbox" id="mcToggle" /> Multiple Choice</label>
-    </div>
-
-    <div id="tableSelect">
-      <h2>Select Tables</h2>
-      <div id="tableList"></div>
-    </div>
-
-    <button id="startBtn">Start Mission</button>
-    <div id="scoreboard"></div>
+  <div id="playerSection">
+    <label>👨‍🚀 Select Player</label>
+    <select id="playerSelect"></select>
+    <label>Create New Player</label>
+    <input type="text" id="newPlayer" placeholder="Enter name" />
+    <div id="avatarPicker"></div>
+    <button id="addPlayerBtn">Add Player</button>
   </div>
 
-  <!-- GAME PAGE -->
-  <div id="gamePage" class="page hidden">
-    <div id="topPanel">
-      <div>🧑‍🚀 <span id="activePlayerLabel"></span></div>
-      <div>Score: <span id="scoreDisplay">0</span></div>
-      <div>Streak: <span id="streakDisplay">0</span></div>
-      <div>⏱️ <span id="timeDisplay">00:00</span></div>
-      <button id="muteBtn">🔊</button>
-      <button id="newMissionBtn">New Mission</button>
-    </div>
-
-    <div id="questionPanel">
-      <div id="qnumDisplay">1</div>
-      <div id="questionText" class="question">3 × 4 = ?</div>
-
-      <div id="answersContainer"></div>
-      <div id="typedAnswer">
-        <input type="number" id="answerInput" placeholder="Answer" />
-        <button id="submitBtn">Submit</button>
-      </div>
-      <div id="feedback" class="feedback"></div>
-      <button id="playAgainBtn" class="hidden">Play Again</button>
-    </div>
+  <div id="modeSection">
+    <h2>Mode</h2>
+    <label><input type="radio" name="mode" value="practice" checked /> Practice</label>
+    <label><input type="radio" name="mode" value="chaos" /> Chaos (50 Random)</label>
+    <label><input type="checkbox" id="mcToggle" /> Multiple Choice</label>
   </div>
 
-  <!-- COUNTDOWN OVERLAY -->
-  <div id="countdownOverlay" class="hidden">
-    <div id="countdownText">3</div>
-    <svg id="rocketSVG" viewBox="0 0 80 160">
-      <defs>
-        <linearGradient id="rocketBody" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#bbb" />
-          <stop offset="100%" stop-color="#666" />
-        </linearGradient>
-      </defs>
-      <polygon points="40,0 60,30 20,30" fill="red" />
-      <rect x="20" y="30" width="40" height="100" fill="url(#rocketBody)" rx="8" />
-      <polygon id="flame" points="40,130 48,150 40,140 32,150" fill="orange" />
-      <rect x="25" y="100" width="10" height="20" fill="#444" />
-      <rect x="45" y="100" width="10" height="20" fill="#444" />
-    </svg>
+  <div id="tableSelect">
+    <h2>Select Tables</h2>
+    <div id="tableList"></div>
   </div>
 
-  <script src="script.js"></script>
+  <button id="startBtn">Start Mission</button>
+</div>
+
+<!-- GAME PAGE -->
+<div id="gamePage" class="page hidden">
+  <div id="topPanel">
+    <div>🧑‍🚀 <span id="activePlayerLabel"></span></div>
+    <div>Score: <span id="scoreDisplay">0</span></div>
+    <div>Streak: <span id="streakDisplay">0</span></div>
+    <div>⏱️ <span id="timeDisplay">00:00</span></div>
+    <button id="muteBtn">🔊</button>
+    <button id="newMissionBtn">New Mission</button>
+  </div>
+
+  <div id="questionPanel">
+    <div id="qnumDisplay">1</div>
+    <div id="questionText" class="question">3 × 4 = ?</div>
+    <div id="answersContainer"></div>
+    <div id="typedAnswer">
+      <input type="number" id="answerInput" placeholder="Answer" />
+      <button id="submitBtn">Submit</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+    <button id="playAgainBtn" class="hidden">Play Again</button>
+  </div>
+</div>
+
+<!-- COUNTDOWN OVERLAY -->
+<div id="countdownOverlay" class="hidden">
+  <div id="countdownText">3</div>
+  <svg id="rocketSVG" viewBox="0 0 80 160">
+    <defs>
+      <linearGradient id="rocketBody" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#bbb" />
+        <stop offset="100%" stop-color="#666" />
+      </linearGradient>
+    </defs>
+    <polygon points="40,0 60,30 20,30" fill="red" />
+    <rect x="20" y="30" width="40" height="100" fill="url(#rocketBody)" rx="8" />
+    <polygon id="flame" points="40,130 48,150 40,140 32,150" fill="orange" />
+    <rect x="25" y="100" width="10" height="20" fill="#444" />
+    <rect x="45" y="100" width="10" height="20" fill="#444" />
+  </svg>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
