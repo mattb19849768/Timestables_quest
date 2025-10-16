@@ -1,53 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --- Canvas Setup ---
   const bgCanvas = document.getElementById('bgCanvas'), bgCtx = bgCanvas.getContext('2d');
   const confCanvas = document.getElementById('confettiCanvas'), confCtx = confCanvas.getContext('2d');
   const fireCanvas = document.getElementById('fireworksCanvas'), fireCtx = fireCanvas.getContext('2d');
 
-  let players = [], activePlayer = null, tables = [], questions = [], currentQ = 0, score = 0, streak = 0;
-  let mode = 'practice', multipleChoice = false;
-  let timerInterval = null, startTime = 0;
-
-  const statPage = document.getElementById('statPage');
-  const gamePage = document.getElementById('gamePage');
-  const playerSelect = document.getElementById('playerSelect');
-  const scoreboard = document.getElementById('scoreboard');
-  const tableList = document.getElementById('tableList');
-  const startBtn = document.getElementById('startBtn');
-  const leaderBtn = document.getElementById('leaderBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const answerInput = document.getElementById('answerInput');
-  const submitBtn = document.getElementById('submitBtn');
-  const answersContainer = document.getElementById('answersContainer');
-  const feedback = document.getElementById('feedback');
-  const activePlayerLabel = document.getElementById('activePlayerLabel');
-  const scoreDisplay = document.getElementById('scoreDisplay');
-  const streakDisplay = document.getElementById('streakDisplay');
-  const qnumDisplay = document.getElementById('qnumDisplay');
-  const countdownOverlay = document.getElementById('countdownOverlay');
-  const countdownText = document.getElementById('countdownText');
-  const rocketSVG = document.getElementById('rocketSVG');
-  const leaderModal = document.getElementById('leaderModal');
-  const leaderClose = document.getElementById('leaderClose');
-
-  const avatarPicker = document.getElementById('avatarPicker');
-  const avatarList = ['🚀','🛸','🌟','🌙','🪐','✨'];
-  let selectedAvatar = null;
-
-  // ------------------ CANVAS RESIZE ------------------
   function resizeCanvas() {
-    bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
-    confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight;
-    fireCanvas.width = window.innerWidth; fireCanvas.height = window.innerHeight;
+    [bgCanvas, confCanvas, fireCanvas].forEach(c => {
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+    });
   }
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
-  // ------------------ PLAYER / AVATAR ------------------
-  avatarList.forEach(a=>{
+  // --- Players and Avatars ---
+  let players = [], activePlayer = null;
+  let selectedAvatar = null;
+  const playerSelect = document.getElementById('playerSelect');
+  const scoreboard = document.getElementById('scoreboard');
+  const avatarPicker = document.getElementById('avatarPicker');
+  const avatarList = ['🚀','🛸','🌟','🌙','🪐','✨'];
+  avatarList.forEach(a => {
     const div = document.createElement('div'); div.className='avatar-choice'; div.textContent=a;
-    div.addEventListener('click',()=>{
-      selectedAvatar=a;
+    div.addEventListener('click', ()=>{
+      selectedAvatar = a;
       document.querySelectorAll('.avatar-choice').forEach(c=>c.classList.remove('selected'));
       div.classList.add('selected');
     });
@@ -55,18 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('addPlayerBtn').addEventListener('click',()=>{
-    const name=document.getElementById('newPlayer').value.trim();
-    if(!name||!selectedAvatar)return alert('Pick avatar and name');
+    const name = document.getElementById('newPlayer').value.trim();
+    if(!name || !selectedAvatar) return alert('Pick avatar and name');
     players.push({name, avatar:selectedAvatar, bestPractice:0, bestChaos:0});
     selectedAvatar=null; document.getElementById('newPlayer').value='';
     document.querySelectorAll('.avatar-choice').forEach(c=>c.classList.remove('selected'));
     savePlayers(); updatePlayerSelect();
   });
 
-  playerSelect.addEventListener('change',()=>{activePlayer=players[playerSelect.value];});
-
-  leaderBtn.addEventListener('click',()=>{leaderModal.classList.remove('hidden');});
-  leaderClose.addEventListener('click',()=>{leaderModal.classList.add('hidden');});
+  playerSelect.addEventListener('change',()=>{activePlayer = players[playerSelect.value];});
 
   function savePlayers(){ localStorage.setItem('ttPlayers', JSON.stringify(players)); }
   function loadPlayers(){ players=JSON.parse(localStorage.getItem('ttPlayers')||'[]'); updatePlayerSelect(); }
@@ -79,30 +53,52 @@ document.addEventListener('DOMContentLoaded', () => {
     scoreboard.innerHTML=players.map(p=>`<div>${p.avatar} ${p.name}: Best Practice ${p.bestPractice||0}, Best Chaos ${p.bestChaos||0}</div>`).join('');
   }
 
-  // ------------------ TABLES ------------------
+  // --- Tables ---
+  const tableList = document.getElementById('tableList');
   for(let i=2;i<=12;i++){
     const chip=document.createElement('div'); chip.className='table-chip'; chip.textContent=i;
-    chip.addEventListener('click',()=>{chip.classList.toggle('selected');});
+    chip.addEventListener('click',()=>chip.classList.toggle('selected'));
     tableList.appendChild(chip);
   }
 
-  // ------------------ TIMER ------------------
+  // --- Game Variables ---
+  let tables=[], questions=[], currentQ=0, score=0, streak=0;
+  let mode='practice', multipleChoice=false;
+  let timerInterval=null, startTime=0;
+
+  // --- Timer ---
   function startTimer(){
     startTime = Date.now();
     timerInterval = setInterval(()=>{
-      const elapsed = Date.now() - startTime;
+      const elapsed = Date.now()-startTime;
       const minutes = Math.floor(elapsed/60000).toString().padStart(2,'0');
       const seconds = Math.floor((elapsed%60000)/1000).toString().padStart(2,'0');
-      document.getElementById('timeDisplay').textContent = `${minutes}:${seconds}`;
+      document.getElementById('timeDisplay').textContent=`${minutes}:${seconds}`;
     },500);
   }
   function stopTimer(){ clearInterval(timerInterval); }
 
-  // ------------------ GAME LOGIC ------------------
-  startBtn.addEventListener('click',startGame);
+  // --- Game Elements ---
+  const statPage=document.getElementById('statPage');
+  const gamePage=document.getElementById('gamePage');
+  const startBtn=document.getElementById('startBtn');
+  const activePlayerLabel=document.getElementById('activePlayerLabel');
+  const scoreDisplay=document.getElementById('scoreDisplay');
+  const streakDisplay=document.getElementById('streakDisplay');
+  const qnumDisplay=document.getElementById('qnumDisplay');
+  const answersContainer=document.getElementById('answersContainer');
+  const feedback=document.getElementById('feedback');
+  const answerInput=document.getElementById('answerInput');
+  const submitBtn=document.getElementById('submitBtn');
+  const countdownOverlay=document.getElementById('countdownOverlay');
+  const countdownText=document.getElementById('countdownText');
+  const rocketSVG=document.getElementById('rocketSVG');
+
   document.getElementById('newMissionBtn').addEventListener('click',()=>{gamePage.classList.add('hidden'); statPage.classList.remove('hidden'); stopTimer();});
   document.getElementById('playAgainBtn').addEventListener('click',startGame);
 
+  // --- Start Game ---
+  startBtn.addEventListener('click',startGame);
   function startGame(){
     if(!activePlayer) return alert('Select player');
     tables=[]; document.querySelectorAll('.table-chip.selected').forEach(c=>tables.push(parseInt(c.textContent)));
@@ -133,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}}
 
-  // ------------------ COUNTDOWN ------------------
+  // --- Countdown / Rocket ---
   function runCountdown(){
     countdownOverlay.classList.remove('hidden');
     let count=3;
@@ -144,10 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
       count--; if(count<-1){clearInterval(interval); countdownOverlay.classList.add('hidden'); showQuestion();}
     },800);
   }
-
   function animateRocket(){let y=0; const anim=setInterval(()=>{y-=8; rocketSVG.style.transform=`translateY(${y}px)`; if(y<-window.innerHeight)clearInterval(anim);},30);}
 
-  // ------------------ SHOW QUESTIONS ------------------
+  // --- Show Questions ---
   function showQuestion(){
     if(currentQ>=questions.length){endGame(); return;}
     const q=questions[currentQ];
@@ -173,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function checkAnswer(ans){
     const q=questions[currentQ]; const correct=q.a*q.b;
-    if(ans===correct){score++; streak++; feedback.textContent='Correct!'; feedback.className='feedback good'; playTone(1200,0.1);}
+    if(ans===correct){score++; streak++; feedback.textContent='Correct!'; feedback.className='feedback good'; playTone(1200,0.1); launchConfetti();}
     else{streak=0; feedback.textContent=`Wrong (${correct})`; feedback.className='feedback bad'; playTone(200,0.1);}
     scoreDisplay.textContent=score; streakDisplay.textContent=streak; currentQ++;
     setTimeout(showQuestion,600);
@@ -187,13 +182,49 @@ document.addEventListener('DOMContentLoaded', () => {
     savePlayers(); updateScoreboard();
   }
 
-  // ------------------ AUDIO ------------------
+  // --- Audio ---
   function playTone(freq,dur){
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
     const o=ctx.createOscillator(); const g=ctx.createGain();
     o.connect(g); g.connect(ctx.destination); o.type='square'; o.frequency.value=freq;
     g.gain.setValueAtTime(0.2,ctx.currentTime); o.start(); o.stop(ctx.currentTime+dur);
   }
+
+  // --- Confetti ---
+  let confettiParticles = [];
+  function launchConfetti(){
+    for(let i=0;i<30;i++){
+      confettiParticles.push({x:Math.random()*confCanvas.width,y:0,vx:(Math.random()-0.5)*2,vy:Math.random()*3+2,color:`hsl(${Math.random()*360},80%,60%)`,size:Math.random()*6+4});
+    }
+  }
+  function updateConfetti(){
+    confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
+    confettiParticles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy*=0.99; p.vy+=0.05;
+      confCtx.fillStyle=p.color; confCtx.fillRect(p.x,p.y,p.size,p.size);
+    });
+    confettiParticles = confettiParticles.filter(p=>p.y<confCanvas.height+10);
+    requestAnimationFrame(updateConfetti);
+  }
+  updateConfetti();
+
+  // --- Starfield Parallax ---
+  const stars = [];
+  for(let i=0;i<200;i++) stars.push({x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,z:Math.random()*1.5+0.5});
+  function updateStars(){
+    bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+    stars.forEach(s=>{
+      s.y += s.z*0.5;
+      if(s.y>bgCanvas.height) s.y=0;
+      bgCtx.fillStyle='white';
+      bgCtx.beginPath(); bgCtx.arc(s.x,s.y,s.z,0,Math.PI*2); bgCtx.fill();
+    });
+    requestAnimationFrame(updateStars);
+  }
+  updateStars();
+
+  // --- Utility ---
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}}
 
   loadPlayers();
 });
