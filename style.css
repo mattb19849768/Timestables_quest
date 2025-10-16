@@ -1,32 +1,20 @@
 html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  background: radial-gradient(ellipse at center, #0b0f29, #000);
-  color: white;
-  font-family: "Orbitron", sans-serif;
+  margin:0; padding:0;
+  width:100%; height:100%;
+  overflow:hidden;
+  background:black;
+  font-family:"Orbitron", sans-serif;
+  color:white;
 }
 
-.page {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  z-index: 2;
-}
-
-.hidden { display: none; }
+.page { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; z-index:2; }
+.hidden { display:none; }
 
 h1 { margin-top:40px; font-size:2.2em; text-shadow:0 0 10px cyan; }
 
 #playerSection, #modeSection, #tableSelect {
   background: rgba(0,0,30,0.6);
-  border: 1px solid #3af; border-radius: 10px;
-  padding:16px; margin:10px; text-align:center; width:90%; max-width:450px;
+  border:1px solid #3af; border-radius:10px; padding:16px; margin:10px; text-align:center; width:90%; max-width:450px;
 }
 
 #playerSelect { width:60%; margin:6px 0; }
@@ -35,7 +23,7 @@ h1 { margin-top:40px; font-size:2.2em; text-shadow:0 0 10px cyan; }
 .avatar-choice.selected { background:#3af; transform:scale(1.2); }
 
 #tableList { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:10px; }
-.table-chip { background: rgba(255,255,255,0.15); border:1px solid #3af; border-radius:6px; padding:8px 12px; cursor:pointer; transition:0.3s;}
+.table-chip { background: rgba(255,255,255,0.15); border:1px solid #3af; border-radius:6px; padding:8px 12px; cursor:pointer; }
 .table-chip.selected{background:#3af;}
 
 #startBtn { background:#3af; color:white; border:none; border-radius:6px; padding:10px 20px; cursor:pointer; font-size:1.2em; margin-top:20px; }
@@ -47,7 +35,7 @@ h1 { margin-top:40px; font-size:2.2em; text-shadow:0 0 10px cyan; }
 .question { font-size:48px; text-shadow:0 0 10px #3af; margin:20px; }
 
 #answersContainer { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
-.answer-btn { background:#222; border:2px solid #3af; color:white; border-radius:8px; padding:12px 20px; cursor:pointer; font-size:20px; transition:0.2s; }
+.answer-btn { background:#222; border:2px solid #3af; color:white; border-radius:8px; padding:12px 20px; cursor:pointer; font-size:20px; }
 .answer-btn:hover{background:#3af;color:black;}
 
 #typedAnswer { display:flex; gap:8px; align-items:center; }
