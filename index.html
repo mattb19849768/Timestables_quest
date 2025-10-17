@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -7,17 +7,17 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Background Canvas -->
+  <!-- Canvases -->
   <canvas id="bgCanvas" aria-hidden="true"></canvas>
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
-  <svg id="svgLayer" aria-hidden="true" preserveAspectRatio="none"></svg>
+  <canvas id="cometCanvas" aria-hidden="true"></canvas>
 
-  <!-- Home / Stats Page -->
+  <!-- Main pages -->
   <div id="statPage" class="page">
     <h1>🚀 Space Times Table Adventure</h1>
 
-    <section class="panel" id="playerSection">
-      <label for="playerSelect">👨‍🚀 Player</label>
+    <section class="panel" id="playerPanel">
+      <label for="playerSelect">👩‍🚀 Player</label>
       <select id="playerSelect" style="max-width:240px;"></select>
 
       <div class="new-player">
@@ -27,18 +27,18 @@
       </div>
     </section>
 
-    <section class="panel" id="modeSection">
+    <section class="panel" id="modePanel">
       <div class="modes">
         <label><input type="radio" name="mode" value="practice" checked> Practice</label>
         <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
-        <label><input type="radio" name="mode" value="lightspeed"> Lightspeed (1min)</label>
+        <label><input type="radio" name="mode" value="lightspeed"> Lightspeed (1 min)</label>
       </div>
       <label class="mc"><input type="checkbox" id="mcToggle"> Multiple choice</label>
     </section>
 
-    <section class="panel" id="tableSelect">
+    <section class="panel" id="tablePanel">
       <strong>Select tables</strong>
-      <div id="tableList" class="table-grid"></div>
+      <div id="tableList" class="table-grid" aria-label="Tables"></div>
     </section>
 
     <div class="controls">
@@ -47,11 +47,10 @@
     </div>
   </div>
 
-  <!-- Game Page -->
   <div id="gamePage" class="page hidden">
     <div id="topPanel">
-      <div>🧑‍🚀 <span id="activePlayerLabel">—</span></div>
-      <div id="questionCounter">Question 0 of 0</div>
+      <div>👩‍🚀 <span id="activePlayerLabel">—</span></div>
+      <div id="questionCounter">Question 0</div>
       <div>Score: <span id="scoreDisplay">0</span></div>
       <div>Streak: <span id="streakDisplay">0</span></div>
       <div>⏱ <span id="timeDisplay">00:00</span></div>
@@ -64,48 +63,86 @@
 
     <main id="questionPanel">
       <div id="questionText" class="question">Prepare for launch…</div>
-      <div id="answersContainer" class="answers"></div>
+      <div id="answersContainer" class="answers" aria-live="polite"></div>
 
       <div id="typedAnswer" class="typed">
         <input id="answerInput" inputmode="numeric" placeholder="Answer" />
         <button id="submitBtn" class="btn">Submit</button>
       </div>
 
+      <!-- Virtual circular keypad -->
+      <div id="keypad" class="keypad hidden" aria-hidden="true">
+        <div class="key-row">
+          <button class="key">1</button>
+          <button class="key">2</button>
+          <button class="key">3</button>
+        </div>
+        <div class="key-row">
+          <button class="key">4</button>
+          <button class="key">5</button>
+          <button class="key">6</button>
+        </div>
+        <div class="key-row">
+          <button class="key">7</button>
+          <button class="key">8</button>
+          <button class="key">9</button>
+        </div>
+        <div class="key-row">
+          <button class="key blank"></button>
+          <button class="key">0</button>
+          <button class="key check">✓</button>
+        </div>
+        <div class="key-row single">
+          <button class="key back">←</button>
+        </div>
+      </div>
+
       <div id="feedback" class="feedback" aria-live="polite"></div>
     </main>
   </div>
 
-  <!-- Countdown / Rocket Overlay -->
+  <!-- Countdown / rocket -->
   <div id="countdownOverlay" class="hidden" aria-hidden="true">
     <div id="countdownText" class="countdown-number">3</div>
     <svg id="rocketSVG" viewBox="0 0 80 160" width="140" height="280" aria-hidden="true">
       <defs>
         <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f0f4ff"/>
-          <stop offset="100%" stop-color="#7c6cff"/>
+          <stop offset="0%" stop-color="#f0f4ff"/><stop offset="100%" stop-color="#7c6cff"/>
         </linearGradient>
         <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#ffd54a"/>
-          <stop offset="1" stop-color="#ff7043"/>
+          <stop offset="0%" stop-color="#ffd54a"/><stop offset="1" stop-color="#ff7043"/>
         </linearGradient>
       </defs>
-      <polygon id="nose" points="40,4 62,34 18,34" fill="#ff6b6b" />
-      <rect id="body" x="22" y="34" width="36" height="92" rx="8" fill="url(#bodyGrad)" />
+      <polygon points="40,4 62,34 18,34" fill="#ff6b6b" />
+      <rect x="22" y="34" width="36" height="92" rx="8" fill="url(#bodyGrad)" />
       <polygon points="22,126 8,148 22,148" fill="#303030" />
       <polygon points="58,126 72,148 58,148" fill="#303030" />
       <circle cx="40" cy="56" r="6" fill="#b8ecff" />
       <circle cx="40" cy="80" r="6" fill="#b8ecff" />
       <circle cx="40" cy="104" r="6" fill="#b8ecff" />
-      <polygon id="flame" points="40,130 52,158 40,146 28,158" fill="url(#flameGrad)" />
+      <polygon id="flame" points="40,130 52,158 40,146 28,158" fill="url(#flameGrad)"/>
     </svg>
   </div>
 
-  <!-- Leaderboard Modal -->
-  <div id="leaderboardModal" class="modal hidden">
+  <!-- Leaderboard -->
+  <div id="leaderboardModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2>🏆 Leaderboard</h2>
       <ul id="leaderboardList"></ul>
       <button id="closeLeaderboard" class="btn">Close</button>
+    </div>
+  </div>
+
+  <!-- Unified Results Modal (shows at end for any mode) -->
+  <div id="resultsModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>📜 Results</h2>
+      <div id="resultsSummary"></div>
+      <ul id="resultsList"></ul>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="closeResults" class="btn">Close</button>
+        <button id="saveToLeaderboard" class="btn ghost">Save Score</button>
+      </div>
     </div>
   </div>
 
