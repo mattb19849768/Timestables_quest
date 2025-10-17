@@ -1,91 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Space Times Table Adventure</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Space Times Table Adventure</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Background Canvas -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+  <svg id="svgLayer" aria-hidden="true" preserveAspectRatio="none"></svg>
 
-<canvas id="bgCanvas"></canvas>
-<canvas id="confettiCanvas"></canvas>
+  <!-- Home / Stats Page -->
+  <div id="statPage" class="page">
+    <h1>🚀 Space Times Table Adventure</h1>
 
-<!-- HOME PAGE -->
-<div id="statPage" class="page">
-  <h1>🚀 Space Times Table Adventure</h1>
+    <section class="panel" id="playerSection">
+      <label for="playerSelect">👨‍🚀 Player</label>
+      <select id="playerSelect" style="max-width:240px;"></select>
 
-  <div id="playerSection">
-    <label>👨‍🚀 Select Player</label>
-    <select id="playerSelect"></select>
-    <label>Create New Player</label>
-    <input type="text" id="newPlayer" placeholder="Enter name">
-    <div id="avatarPicker"></div>
-    <button id="addPlayerBtn">Add Player</button>
-  </div>
+      <div class="new-player">
+        <input id="newPlayer" placeholder="New player name" />
+        <div id="avatarPicker" class="avatar-picker" aria-label="Pick avatar"></div>
+        <button id="addPlayerBtn" class="btn">Add</button>
+      </div>
+    </section>
 
-  <div id="modeSection">
-    <h2>Mode</h2>
-    <label><input type="radio" name="mode" value="practice" checked> Practice</label>
-    <label><input type="radio" name="mode" value="chaos"> Chaos (50 Random)</label>
-    <label><input type="checkbox" id="mcToggle"> Multiple Choice</label>
-  </div>
+    <section class="panel" id="modeSection">
+      <div class="modes">
+        <label><input type="radio" name="mode" value="practice" checked> Practice</label>
+        <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
+        <label><input type="radio" name="mode" value="lightspeed"> Lightspeed (1min)</label>
+      </div>
+      <label class="mc"><input type="checkbox" id="mcToggle"> Multiple choice</label>
+    </section>
 
-  <div id="tableSelect">
-    <h2>Select Tables</h2>
-    <div id="tableList"></div>
-  </div>
+    <section class="panel" id="tableSelect">
+      <strong>Select tables</strong>
+      <div id="tableList" class="table-grid"></div>
+    </section>
 
-  <button id="startBtn">Start Mission</button>
-</div>
-
-<!-- GAME PAGE -->
-<div id="gamePage" class="page hidden">
-  <div id="topPanel">
-    <div>🧑‍🚀 <span id="activePlayerLabel"></span></div>
-    <div>Score: <span id="scoreDisplay">0</span></div>
-    <div>Streak: <span id="streakDisplay">0</span></div>
-    <div>⏱️ <span id="timeDisplay">00:00</span></div>
-    <button id="muteBtn">🔊</button>
-    <button id="newMissionBtn">New Mission</button>
-  </div>
-
-  <div id="questionPanel">
-    <div id="questionText" class="question"></div>
-    <div id="answersContainer"></div>
-    <div id="typedAnswer">
-      <input type="number" id="answerInput" placeholder="Answer">
-      <button id="submitBtn">Submit</button>
+    <div class="controls">
+      <button id="startBtn" class="btn primary">Start Mission</button>
+      <button id="resetPlayers" class="btn ghost">Reset Players</button>
     </div>
-    <div id="feedback" class="feedback"></div>
   </div>
-</div>
 
-<!-- COUNTDOWN OVERLAY -->
-<div id="countdownOverlay" class="hidden">
-  <div id="countdownText">3</div>
-  <svg id="rocketSVG" viewBox="0 0 80 160" width="100">
-    <defs>
-      <linearGradient id="rocketBodyGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#bbb"/>
-        <stop offset="100%" stop-color="#666"/>
-      </linearGradient>
-      <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="yellow"/>
-        <stop offset="1" stop-color="orange"/>
-      </linearGradient>
-    </defs>
-    <polygon points="40,0 60,30 20,30" fill="red"/>
-    <rect x="20" y="30" width="40" height="100" fill="url(#rocketBodyGrad)" rx="8"/>
-    <polygon points="20,120 10,140 20,140" fill="#444"/>
-    <polygon points="60,120 70,140 60,140" fill="#444"/>
-    <circle cx="40" cy="50" r="5" fill="skyblue"/>
-    <circle cx="40" cy="70" r="5" fill="skyblue"/>
-    <circle cx="40" cy="90" r="5" fill="skyblue"/>
-    <polygon id="flame" points="40,130 48,150 40,140 32,150" fill="url(#flameGrad)"/>
-  </svg>
-</div>
+  <!-- Game Page -->
+  <div id="gamePage" class="page hidden">
+    <div id="topPanel">
+      <div>🧑‍🚀 <span id="activePlayerLabel">—</span></div>
+      <div id="questionCounter">Question 0 of 0</div>
+      <div>Score: <span id="scoreDisplay">0</span></div>
+      <div>Streak: <span id="streakDisplay">0</span></div>
+      <div>⏱ <span id="timeDisplay">00:00</span></div>
+      <div class="right-controls">
+        <button id="muteBtn" class="btn">🔊</button>
+        <button id="leaderboardBtn" class="btn ghost">Leaderboard</button>
+        <button id="newMissionBtn" class="btn ghost">New Mission</button>
+      </div>
+    </div>
 
-<script src="script.js"></script>
+    <main id="questionPanel">
+      <div id="questionText" class="question">Prepare for launch…</div>
+      <div id="answersContainer" class="answers"></div>
+
+      <div id="typedAnswer" class="typed">
+        <input id="answerInput" inputmode="numeric" placeholder="Answer" />
+        <button id="submitBtn" class="btn">Submit</button>
+      </div>
+
+      <div id="feedback" class="feedback" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <!-- Countdown / Rocket Overlay -->
+  <div id="countdownOverlay" class="hidden" aria-hidden="true">
+    <div id="countdownText" class="countdown-number">3</div>
+    <svg id="rocketSVG" viewBox="0 0 80 160" width="140" height="280" aria-hidden="true">
+      <defs>
+        <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f0f4ff"/>
+          <stop offset="100%" stop-color="#7c6cff"/>
+        </linearGradient>
+        <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffd54a"/>
+          <stop offset="1" stop-color="#ff7043"/>
+        </linearGradient>
+      </defs>
+      <polygon id="nose" points="40,4 62,34 18,34" fill="#ff6b6b" />
+      <rect id="body" x="22" y="34" width="36" height="92" rx="8" fill="url(#bodyGrad)" />
+      <polygon points="22,126 8,148 22,148" fill="#303030" />
+      <polygon points="58,126 72,148 58,148" fill="#303030" />
+      <circle cx="40" cy="56" r="6" fill="#b8ecff" />
+      <circle cx="40" cy="80" r="6" fill="#b8ecff" />
+      <circle cx="40" cy="104" r="6" fill="#b8ecff" />
+      <polygon id="flame" points="40,130 52,158 40,146 28,158" fill="url(#flameGrad)" />
+    </svg>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div id="leaderboardModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🏆 Leaderboard</h2>
+      <ul id="leaderboardList"></ul>
+      <button id="closeLeaderboard" class="btn">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
