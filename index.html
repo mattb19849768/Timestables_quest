@@ -7,12 +7,12 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Canvases: background layers -->
+  <!-- Canvases for parallax and effects -->
   <canvas id="bgCanvas" aria-hidden="true"></canvas>
-  <canvas id="cometCanvas" aria-hidden="true"></canvas>
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+  <canvas id="cometCanvas" aria-hidden="true"></canvas>
 
-  <!-- Home / Setup Page -->
+  <!-- Home / stats page -->
   <div id="statPage" class="page">
     <h1>🚀 Space Times Table Adventure</h1>
 
@@ -21,21 +21,17 @@
       <select id="playerSelect" style="max-width:240px;"></select>
 
       <div class="new-player">
-        <input id="newPlayer" placeholder="New player name (press Enter to add)" />
-        <button id="addPlayerBtn" class="btn">Add</button>
-        <button id="resetPlayers" class="btn ghost">Reset</button>
-      </div>
-
-      <div class="avatar-row">
+        <input id="newPlayer" placeholder="New player name" />
         <div id="avatarPicker" class="avatar-picker" aria-label="Pick avatar"></div>
+        <button id="addPlayerBtn" class="btn">Add</button>
       </div>
     </section>
 
     <section class="panel" id="modePanel">
       <div class="modes">
-        <label class="mode-btn selected" data-mode="practice"><input type="radio" name="mode" value="practice" checked hidden> Practice</label>
-        <label class="mode-btn" data-mode="chaos"><input type="radio" name="mode" value="chaos" hidden> Chaos (50)</label>
-        <label class="mode-btn" data-mode="lightspeed"><input type="radio" name="mode" value="lightspeed" hidden> Lightspeed (1 min)</label>
+        <label><input type="radio" name="mode" value="practice" checked> Practice</label>
+        <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
+        <label><input type="radio" name="mode" value="lightspeed"> Lightspeed (1 min)</label>
       </div>
       <label class="mc"><input type="checkbox" id="mcToggle"> Multiple choice</label>
     </section>
@@ -47,16 +43,11 @@
 
     <div class="controls">
       <button id="startBtn" class="btn primary">Start Mission</button>
-      <button id="leaderboardBtn" class="btn ghost">Leaderboard</button>
-      <button id="muteBtn" class="btn">🔊</button>
-    </div>
-
-    <div class="coins-panel panel" id="walletPanel">
-      <div>Space Bucks: <span id="walletDisplay">0</span> 🪙</div>
+      <button id="resetPlayers" class="btn ghost">Reset Players</button>
     </div>
   </div>
 
-  <!-- Game Page -->
+  <!-- Game page -->
   <div id="gamePage" class="page hidden">
     <div id="topPanel">
       <div>👩‍🚀 <span id="activePlayerLabel">—</span></div>
@@ -65,6 +56,8 @@
       <div>Streak: <span id="streakDisplay">0</span></div>
       <div>⏱ <span id="timeDisplay">00:00</span></div>
       <div class="right-controls">
+        <button id="muteBtn" class="btn">🔊</button>
+        <button id="leaderboardBtn" class="btn ghost">Leaderboard</button>
         <button id="newMissionBtn" class="btn ghost">New Mission</button>
       </div>
     </div>
@@ -74,12 +67,12 @@
       <div id="answersContainer" class="answers" aria-live="polite"></div>
 
       <div id="typedAnswer" class="typed">
-        <input id="answerInput" inputmode="numeric" placeholder="Answer (press Enter)" />
+        <input id="answerInput" inputmode="numeric" placeholder="Answer" />
         <button id="submitBtn" class="btn">Submit</button>
       </div>
 
-      <!-- Circular virtual keypad -->
-      <div id="keypad" class="keypad" aria-hidden="true">
+      <!-- Virtual circular keypad -->
+      <div id="keypad" class="keypad hidden" aria-hidden="true">
         <div class="key-row">
           <button class="key">1</button>
           <button class="key">2</button>
@@ -96,12 +89,12 @@
           <button class="key">9</button>
         </div>
         <div class="key-row">
-          <button class="key blank" aria-hidden="true"></button>
+          <button class="key blank"></button>
           <button class="key">0</button>
           <button class="key check">✓</button>
         </div>
         <div class="key-row single">
-          <button class="key back">← Backspace</button>
+          <button class="key back">←</button>
         </div>
       </div>
 
@@ -109,7 +102,7 @@
     </main>
   </div>
 
-  <!-- Countdown / rocket overlay -->
+  <!-- Countdown overlay -->
   <div id="countdownOverlay" class="hidden" aria-hidden="true">
     <div id="countdownText" class="countdown-number">3</div>
     <svg id="rocketSVG" viewBox="0 0 80 160" width="140" height="280" aria-hidden="true">
@@ -132,18 +125,16 @@
     </svg>
   </div>
 
-  <!-- Leaderboard Modal -->
+  <!-- Leaderboard modal -->
   <div id="leaderboardModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2>🏆 Leaderboard</h2>
       <ul id="leaderboardList"></ul>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button id="closeLeaderboard" class="btn">Close</button>
-      </div>
+      <button id="closeLeaderboard" class="btn">Close</button>
     </div>
   </div>
 
-  <!-- Results Modal -->
+  <!-- Results modal -->
   <div id="resultsModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2>📜 Results</h2>
