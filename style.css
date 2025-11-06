@@ -59,10 +59,27 @@ h1{color:var(--accent);text-shadow:0 0 18px rgba(125,211,252,0.3);margin:6px 0}
 #rocketSVG{transition:transform 1s cubic-bezier(.2,.9,.2,1);filter:drop-shadow(0 12px 30px rgba(0,0,0,0.6))}
 
 /* Modal */
-.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:10}
+ .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:10}
+ 
+ #leaderboardModal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  z-index: 9999; /* must be above your canvases */
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  max-width: 90%;
+}
+
+.hidden { 
+  display: none !important; 
+}
 .modal-content{background:var(--panel);padding:18px;border-radius:12px;max-width:760px;width:92%;color:#e6eef8}
 .modal-content ul{list-style:none;padding:0;margin:0;max-height:420px;overflow:auto}
 .modal-content li{padding:8px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center}
+
 
 /* Responsive */
 @media(max-width:820px){

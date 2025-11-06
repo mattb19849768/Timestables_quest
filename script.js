@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultsModal = $('resultsModal'), resultsList = $('resultsList'), resultsSummary = $('resultsSummary');
   const closeResults = $('closeResults'), saveToLeaderboard = $('saveToLeaderboard');
   const newMissionBtn = $('newMissionBtn'), muteBtn = $('muteBtn'), walletDisplay = $('walletDisplay');
-
   const bg = bgCanvas?.getContext('2d') || null;
   const cometCtx = cometCanvas?.getContext('2d') || null;
   const conf = confettiCanvas?.getContext('2d') || null;
@@ -57,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===========================
      Audio: SFX & Music
   =========================== */
-  const sfxVolume = 1.0, musicRelative = 0.8;
+  let sfxVolume = 1.0, musicRelative = 0.8;
   const SFX = {
     start: new Audio('sounds/start.mp3'),
     countdown: new Audio('sounds/countdown.mp3'),
@@ -122,26 +121,74 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===========================
      Music Toggle UI
   =========================== */
-  function createMusicToggleUI(){
-    if(!muteBtn||!muteBtn.parentElement) return;
-    if($('musicBtn')) return;
-    const btn = document.createElement('button');
-    btn.id='musicBtn'; btn.className='btn'; btn.style.marginLeft='8px'; btn.textContent=musicOn?'🎵':'🔕';
-    muteBtn.parentElement.insertBefore(btn,muteBtn.nextSibling);
-    btn.addEventListener('click',()=>{
-      musicOn=!musicOn; btn.textContent=musicOn?'🎵':'🔕';
-      if(musicOn){ if(!bgMusic) pickRandomMusic(); playMusic(); } else { stopMusic(); }
+function createMusicToggleUI() {
+  if (!muteBtn || !muteBtn.parentElement) return;
+  if ($('musicBtn')) return;
+
+  // Music toggle button
+  const btn = document.createElement('button');
+  btn.id = 'musicBtn';
+  btn.className = 'btn';
+  btn.style.marginLeft = '8px';
+  btn.textContent = musicOn ? '🎵' : '🔕';
+  muteBtn.parentElement.insertBefore(btn, muteBtn.nextSibling);
+
+  // Volume slider
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = 0;
+  slider.max = 100;
+  slider.value = Math.round(musicRelative * 100);
+  slider.title = 'Volume (Music & SFX)';
+  slider.style.marginLeft = '8px';
+  muteBtn.parentElement.insertBefore(slider, btn.nextSibling);
+
+  // Music toggle click
+  btn.addEventListener('click', () => {
+    musicOn = !musicOn;
+    btn.textContent = musicOn ? '🎵' : '🔕';
+    if (musicOn) {
+      if (!bgMusic) pickRandomMusic();
+      if (bgMusic) {
+        bgMusic.muted = mutedSfx;
+        playMusic();
+      }
+    } else {
+      stopMusic();
+    }
+  });
+
+  // Volume slider input — updates both music and SFX
+  slider.addEventListener('input', () => {
+    const volume = Number(slider.value) / 100;
+    musicRelative = volume;        // update music relative
+    sfxVolume = volume;            // update SFX volume
+    if (bgMusic) bgMusic.volume = musicOn && !mutedSfx ? musicRelative : 0;
+
+    // Apply volume to all SFX
+    Object.values(SFX).forEach(a => {
+      if (a) a.volume = mutedSfx ? 0 : sfxVolume;
     });
-    const slider = document.createElement('input');
-    slider.type='range'; slider.min=0; slider.max=100; slider.value=Math.round(musicRelative*100);
-    slider.title='Music volume'; slider.style.marginLeft='8px';
-    muteBtn.parentElement.insertBefore(slider,btn.nextSibling);
-    slider.addEventListener('input',()=>{
-      const v=Number(slider.value)/100;
-      if(bgMusic) fadeAudio(bgMusic,sfxVolume*v,200);
+  });
+
+  // Mute button affects both SFX and music
+  muteBtn.addEventListener('click', () => {
+    mutedSfx = !mutedSfx;
+    muteBtn.textContent = mutedSfx ? '🔇' : '🔊';
+
+    // Music mute
+    if (bgMusic) bgMusic.muted = mutedSfx;
+
+    // SFX mute
+    Object.values(SFX).forEach(a => {
+      if (a) a.volume = mutedSfx ? 0 : sfxVolume;
     });
-  }
-  createMusicToggleUI();
+  });
+}
+
+createMusicToggleUI();
+
+
 
   /* ===========================
      Background: stars, planets, emojis
@@ -362,36 +409,41 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Topbar question counter logic: practice => "Question X of Y", lightspeed => "Question X of 50", chaos => "Question X"
-  function updateTopbar(){
-    const practiceTotal = (selectedTables.length * 12) || 0;
+ function updateTopbar(){
+  const practiceTotal = (selectedTables.length * 12) || 0;
 
-    if (mode === 'practice') {
-      const total = practiceTotal;
-      questionCounter.textContent = `Question ${Math.min(currentQ + 1, total)} of ${total}`;
-    } else if (mode === 'lightspeed') {
-      questionCounter.textContent = `Question ${Math.max(1, currentQ + 1)} of 50`;
-    } else if (mode === 'chaos') {
-      questionCounter.textContent = `Question ${Math.max(1, currentQ + 1)}`;
-    } else {
-      // fallback
-      questionCounter.textContent = `Question ${Math.max(1, currentQ + 1)}`;
-    }
-
-    // update score & streak displays
-    scoreDisplay && (scoreDisplay.textContent = score);
-    streakDisplay && (streakDisplay.textContent = streak);
-
-    // walletDisplay (in-game) shows coins earned so far this mission or total? We'll show player's total coins in topbar wallet,
-    // while missionCoins is displayed in the mission area. Keep walletDisplay as player's current total coins.
-    if (walletDisplay) {
-      const idx = Number(playerSelect.value || activeIndex || 0);
-      walletDisplay.textContent = players[idx]?.coins || 0;
-    }
-
-    // update mission coins display if present
-    const missionEl = document.getElementById('missionCoins');
-    if (missionEl) missionEl.textContent = `${missionCoins} 🪙`;
+  if (mode === 'practice') {
+    const total = practiceTotal;
+    questionCounter.textContent = `Question ${Math.min(currentQ + 1, total)} of ${total}`;
+  } 
+  else if (mode === 'lightspeed') {
+    // Lightspeed: you answer as many as possible in 1 minute
+    questionCounter.textContent = `Question ${Math.max(1, currentQ + 1)}`;
+  } 
+  else if (mode === 'chaos') {
+    // Chaos: show "Question X of 50" like you want
+    questionCounter.textContent = `Question ${Math.max(1, currentQ + 1)} of 50`;
+  } 
+  else {
+    // fallback
+    questionCounter.textContent = `Question ${Math.max(1, currentQ + 1)}`;
   }
+
+  // update score & streak displays
+  scoreDisplay && (scoreDisplay.textContent = score);
+  streakDisplay && (streakDisplay.textContent = streak);
+
+  // walletDisplay (player's total coins)
+  if (walletDisplay) {
+    const idx = Number(playerSelect.value || activeIndex || 0);
+    walletDisplay.textContent = players[idx]?.coins || 0;
+  }
+
+  // mission coins display
+  const missionEl = document.getElementById('missionCoins');
+  if (missionEl) missionEl.textContent = `${missionCoins} 🪙`;
+}
+
 
   function presentQuestion(){
 
@@ -683,23 +735,69 @@ document.addEventListener('DOMContentLoaded', () => {
       updateLeaderboard();
       alert('Score saved to player.');
     }
+	// After finishing a round
+if (players[activeIndex]) {
+  const now = Date.now();
+  let log = JSON.parse(localStorage.getItem(`ttPlayer_${activePlayer.name}_${mode}`) || '[]');
+
+  if (mode === 'practice' || mode === 'chaos') {
+    // log fastest time in seconds
+    const elapsedSec = Math.floor((Date.now() - startTime)/1000);
+    log.push({ ts: now, timeSec: elapsedSec });
+  } else if (mode === 'lightspeed') {
+    // log number of questions answered
+    log.push({ ts: now, score: score });
+  }
+
+  localStorage.setItem(`ttPlayer_${activePlayer.name}_${mode}`, JSON.stringify(log));
+}
+
   });
 
   /* ===========================
      Leaderboard
   =========================== */
-  function updateLeaderboard() {
-    if (!leaderboardList) return;
-    leaderboardList.innerHTML = '';
-    players.slice().sort((a,b)=>(b.lastScore||0)-(a.lastScore||0)).forEach(p=>{
-      const li = document.createElement('li');
-      li.innerHTML = `<span>${p.avatar} ${p.name}</span><strong>${p.lastScore ?? '-'}</strong>`;
-      leaderboardList.appendChild(li);
-    });
-  }
+ function updateLeaderboard() {
+  if (!leaderboardList) return;
+  leaderboardList.innerHTML = '';
 
-  leaderboardBtn?.addEventListener('click', ()=>{ updateLeaderboard(); leaderboardModal?.classList.remove('hidden'); });
-  closeLeaderboard?.addEventListener('click', ()=>{ leaderboardModal?.classList.add('hidden'); });
+  // Determine current mode
+  const modeRadio = document.querySelector('input[name="mode"]:checked');
+  const currentMode = modeRadio?.value || 'practice';
+
+  // Collect leaderboard entries for this mode
+  let entries = [];
+  players.forEach(p => {
+    const log = JSON.parse(localStorage.getItem(`ttPlayer_${p.name}_${currentMode}`) || '[]');
+    if (log.length) {
+      if (currentMode === 'practice' || currentMode === 'chaos') {
+        // fastest time
+        const fastest = Math.min(...log.map(x => x.timeSec));
+        entries.push({ name: p.name, avatar: p.avatar, value: fastest });
+      } else if (currentMode === 'lightspeed') {
+        // highest questions answered
+        const bestScore = Math.max(...log.map(x => x.score));
+        entries.push({ name: p.name, avatar: p.avatar, value: bestScore });
+      }
+    }
+  });
+
+  // Sort
+  entries.sort((a,b)=>a.value - b.value);
+  if (currentMode === 'lightspeed') entries.sort((a,b)=>b.value - a.value);
+
+  // Display top 3
+  entries.slice(0,3).forEach((e,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${i+1}. ${e.avatar} ${e.name}</span><strong>${e.value}${currentMode==='lightspeed'?' pts':' sec'}</strong>`;
+    leaderboardList.appendChild(li);
+  });
+
+  // Show mode in modal header
+  const header = leaderboardModal.querySelector('.modal-header');
+  if (header) header.textContent = `Leaderboard — Mode: ${currentMode}`;
+}
+
 
   /* ===========================
      New Mission / Back to Menu
@@ -761,5 +859,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTotalCoinsDisplay();
     updateMissionCoinsDisplay();
   })();
+ leaderboardBtn?.addEventListener('click', () => {
+  updateLeaderboard();
+  leaderboardModal?.classList.remove('hidden');
+});
+
+// Hide modal
+closeLeaderboard?.addEventListener('click', () => {
+  leaderboardModal?.classList.add('hidden');
+});
+
+console.log('Leaderboard button', leaderboardBtn);
+console.log('Leaderboard modal', leaderboardModal);
 
 }); // DOMContentLoaded end
