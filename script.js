@@ -53,141 +53,136 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const defaultAvatars = ['🚀','🛸','👽','🌟','🌕','🪐','🛰','☄️','✨','🪄'];
 
-  /* ===========================
-     Audio: SFX & Music
-  =========================== */
-  let sfxVolume = 1.0, musicRelative = 0.8;
-  const SFX = {
-    start: new Audio('sounds/start.mp3'),
-    countdown: new Audio('sounds/countdown.mp3'),
-    correct: new Audio('sounds/correct.mp3'),
-    wrong: new Audio('sounds/wrong.mp3'),
-    fireworks: new Audio('sounds/fireworks.mp3'),
-    coin: new Audio('sounds/coin.mp3'),
-  };
-  Object.values(SFX).forEach(a => { try { a.volume = sfxVolume; a.preload='auto'; } catch(e){} });
+/* ===========================
+   Audio: SFX & Music
+=========================== */
+ sfxVolume = 1.0;       // SFX volume
+ musicRelative = 0.8;   // Music volume
+// let mutedSfx = false;      // SFX mute
+// let musicOn = true;        // Music toggle
 
-  const MUSIC_FILES = ['sounds/music_1.mp3','sounds/music_2.mp3'];
-  let bgMusic = null, bgMusicSrc = null;
+const SFX = {
+  start: new Audio('sounds/start.mp3'),
+  countdown: new Audio('sounds/countdown.mp3'),
+  correct: new Audio('sounds/correct.mp3'),
+  wrong: new Audio('sounds/wrong.mp3'),
+  fireworks: new Audio('sounds/fireworks.mp3'),
+  coin: new Audio('sounds/coin.mp3'),
+};
 
-  function createMusic(src){
-    try {
-      const a = new Audio(src); a.loop = true; a.preload='auto';
-      a.volume = Math.max(0,Math.min(1,sfxVolume*musicRelative));
-      return a;
-    } catch(e){ return null; }
-  }
+// Set initial SFX volume
+Object.values(SFX).forEach(a => { if(a){ a.volume = sfxVolume; a.preload='auto'; } });
 
-  function pickRandomMusic() {
-    const idx = Math.floor(Math.random()*MUSIC_FILES.length);
-    bgMusicSrc = MUSIC_FILES[idx];
-    if (bgMusic && typeof bgMusic.pause === 'function') { try { bgMusic.pause(); } catch(e){} }
-    bgMusic = createMusic(bgMusicSrc);
-    return bgMusic;
-  }
+const MUSIC_FILES = ['sounds/music_1.mp3','sounds/music_2.mp3'];
+let bgMusic = null;
+let bgMusicSrc = null;
 
-  function playSfx(name) {
-    if (mutedSfx) return;
-    const a = SFX[name]; if (!a) return;
-    try { a.currentTime=0; a.play().catch(()=>{}); } catch(e){}
-  }
+function createMusic(src){
+  try {
+    const a = new Audio(src);
+    a.loop = true;
+    a.preload = 'auto';
+    a.volume = musicRelative;
+    return a;
+  } catch(e){ return null; }
+}
 
-  function fadeAudio(audio, toVolume, duration=700){
-    if (!audio) return;
-    const steps = Math.max(8, Math.round(duration/50)), stepTime = duration/steps;
-    const start = audio.volume, delta = toVolume - start;
-    if (audio._fadeInterval){ clearInterval(audio._fadeInterval); audio._fadeInterval=null; }
-    let step=0;
-    audio._fadeInterval = setInterval(()=>{
-      step++; const t = step/steps;
-      audio.volume = Math.max(0,Math.min(1,start+delta*t));
-      if(step>=steps){ clearInterval(audio._fadeInterval); audio._fadeInterval=null; audio.volume=Math.max(0,Math.min(1,toVolume));
-        if(toVolume===0){ try{audio.pause();}catch(e){} }
-      }
-    }, stepTime);
-  }
-  function playMusic(){
-    if(!musicOn) return;
-    if(!bgMusic) pickRandomMusic();
-    if(!bgMusic) return;
-    try{ bgMusic.volume=0; bgMusic.play().catch(()=>{}); fadeAudio(bgMusic, sfxVolume*musicRelative, 1000); }catch(e){}
-  }
+function pickRandomMusic() {
+  const idx = Math.floor(Math.random() * MUSIC_FILES.length);
+  bgMusicSrc = MUSIC_FILES[idx];
+  if(bgMusic) try{ bgMusic.pause(); } catch(e){}
+  bgMusic = createMusic(bgMusicSrc);
+  return bgMusic;
+}
 
-  function stopMusic(){ if(bgMusic) fadeAudio(bgMusic,0,700); }
-  function pauseMusicImmediate(){ if(bgMusic){ if(bgMusic._fadeInterval){clearInterval(bgMusic._fadeInterval); bgMusic._fadeInterval=null;} try{bgMusic.pause();}catch(e){} } }
+function playSfx(name) {
+  if(mutedSfx) return;
+  const a = SFX[name];
+  if(!a) return;
+  try{ a.currentTime = 0; a.play().catch(()=>{}); } catch(e){}
+}
 
-  if(muteBtn) muteBtn.addEventListener('click',()=>{ mutedSfx=!mutedSfx; muteBtn.textContent=mutedSfx?'🔇':'🔊'; });
+function fadeAudio(audio, toVolume, duration=700){
+  if(!audio) return;
+  const steps = Math.max(8, Math.round(duration/50));
+  const stepTime = duration/steps;
+  const start = audio.volume;
+  const delta = toVolume - start;
+  if(audio._fadeInterval){ clearInterval(audio._fadeInterval); audio._fadeInterval=null; }
+  let step=0;
+  audio._fadeInterval = setInterval(()=>{
+    step++;
+    const t = step/steps;
+    audio.volume = Math.max(0, Math.min(1, start + delta*t));
+    if(step>=steps){
+      clearInterval(audio._fadeInterval);
+      audio._fadeInterval = null;
+      audio.volume = Math.max(0, Math.min(1, toVolume));
+      if(toVolume===0) try{ audio.pause(); } catch(e){}
+    }
+  }, stepTime);
+}
 
-  /* ===========================
-     Music Toggle UI
-  =========================== */
-function createMusicToggleUI() {
-  if (!muteBtn || !muteBtn.parentElement) return;
-  if ($('musicBtn')) return;
+function playMusic() {
+  if(!musicOn || !bgMusic) return;
+  bgMusic.volume = musicRelative;
+  bgMusic.play().catch(()=>{});
+  fadeAudio(bgMusic, musicRelative, 1000);
+}
+
+function stopMusic() { if(bgMusic) fadeAudio(bgMusic, 0, 700); }
+function pauseMusicImmediate() { if(bgMusic){ if(bgMusic._fadeInterval){clearInterval(bgMusic._fadeInterval); bgMusic._fadeInterval=null;} try{ bgMusic.pause(); } catch(e){} } }
+
+/* ===========================
+   Music & SFX UI
+=========================== */
+function createMusicToggleUI(){
+  if(!muteBtn || !muteBtn.parentElement) return;
+  if($('musicBtn')) return;
 
   // Music toggle button
-  const btn = document.createElement('button');
-  btn.id = 'musicBtn';
-  btn.className = 'btn';
-  btn.style.marginLeft = '8px';
-  btn.textContent = musicOn ? '🎵' : '🔕';
-  muteBtn.parentElement.insertBefore(btn, muteBtn.nextSibling);
+  const musicBtn = document.createElement('button');
+  musicBtn.id = 'musicBtn';
+  musicBtn.className = 'btn';
+  musicBtn.style.marginLeft = '8px';
+  musicBtn.textContent = musicOn ? '🎵' : '🔕';
+  muteBtn.parentElement.insertBefore(musicBtn, muteBtn.nextSibling);
 
-  // Volume slider
+  // Volume slider (controls both SFX & music volume independently)
   const slider = document.createElement('input');
-  slider.type = 'range';
-  slider.min = 0;
-  slider.max = 100;
-  slider.value = Math.round(musicRelative * 100);
-  slider.title = 'Volume (Music & SFX)';
-  slider.style.marginLeft = '8px';
-  muteBtn.parentElement.insertBefore(slider, btn.nextSibling);
+  slider.type='range';
+  slider.min=0; slider.max=100;
+  slider.value = Math.round(musicRelative*100);
+  slider.title='Volume';
+  slider.style.marginLeft='8px';
+  muteBtn.parentElement.insertBefore(slider, musicBtn.nextSibling);
 
-  // Music toggle click
-  btn.addEventListener('click', () => {
+  // Music button click
+  musicBtn.addEventListener('click', () => {
     musicOn = !musicOn;
-    btn.textContent = musicOn ? '🎵' : '🔕';
-    if (musicOn) {
-      if (!bgMusic) pickRandomMusic();
-      if (bgMusic) {
-        bgMusic.muted = mutedSfx;
-        playMusic();
-      }
-    } else {
-      stopMusic();
-    }
+    musicBtn.textContent = musicOn ? '🎵' : '🔕';
+    if(musicOn){ if(!bgMusic) pickRandomMusic(); playMusic(); } else { stopMusic(); }
   });
 
-  // Volume slider input — updates both music and SFX
+  // Volume slider input
   slider.addEventListener('input', () => {
-    const volume = Number(slider.value) / 100;
-    musicRelative = volume;        // update music relative
-    sfxVolume = volume;            // update SFX volume
-    if (bgMusic) bgMusic.volume = musicOn && !mutedSfx ? musicRelative : 0;
-
-    // Apply volume to all SFX
-    Object.values(SFX).forEach(a => {
-      if (a) a.volume = mutedSfx ? 0 : sfxVolume;
-    });
+    const vol = Number(slider.value)/100;
+    musicRelative = vol;
+    sfxVolume = vol;
+    if(bgMusic) bgMusic.volume = musicOn ? musicRelative : 0;
+    Object.values(SFX).forEach(a => { if(a) a.volume = mutedSfx ? 0 : sfxVolume; });
   });
 
-  // Mute button affects both SFX and music
+  // SFX mute button
   muteBtn.addEventListener('click', () => {
     mutedSfx = !mutedSfx;
     muteBtn.textContent = mutedSfx ? '🔇' : '🔊';
-
-    // Music mute
-    if (bgMusic) bgMusic.muted = mutedSfx;
-
-    // SFX mute
-    Object.values(SFX).forEach(a => {
-      if (a) a.volume = mutedSfx ? 0 : sfxVolume;
-    });
+    // Only affects SFX
+    Object.values(SFX).forEach(a => { if(a) a.volume = mutedSfx ? 0 : sfxVolume; });
   });
 }
 
 createMusicToggleUI();
-
 
 
   /* ===========================
