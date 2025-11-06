@@ -25,6 +25,8 @@
         <div id="avatarPicker" class="avatar-picker" aria-label="Pick avatar"></div>
         <button id="addPlayerBtn" class="btn">Add</button>
       </div>
+
+      <div id="totalCoinsDisplay" style="margin-top:6px;font-weight:700;">🪙 Total coins: 0</div>
     </section>
 
     <section class="panel" id="modePanel">
@@ -55,6 +57,7 @@
       <div>Score: <span id="scoreDisplay">0</span></div>
       <div>Streak: <span id="streakDisplay">0</span></div>
       <div>⏱ <span id="timeDisplay">00:00</span></div>
+      <div>🪙 <span id="walletDisplay">0</span></div>
       <div class="right-controls">
         <button id="muteBtn" class="btn">🔊</button>
         <button id="leaderboardBtn" class="btn ghost">Leaderboard</button>
@@ -70,6 +73,8 @@
         <input id="answerInput" inputmode="numeric" placeholder="Answer" />
         <button id="submitBtn" class="btn">Submit</button>
       </div>
+
+      <div>Coins earned this mission: <span id="missionCoins">0</span></div>
 
       <!-- Virtual circular keypad -->
       <div id="keypad" class="keypad hidden" aria-hidden="true">
