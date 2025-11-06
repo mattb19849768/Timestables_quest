@@ -394,6 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function presentQuestion(){
+
     // For lightspeed regenerate if we run out
     if (mode === 'lightspeed' && currentQ >= questions.length - 1) { generateQuestions(); currentQ = 0; }
 
@@ -581,6 +582,12 @@ document.addEventListener('DOMContentLoaded', () => {
      Start Gameplay
   =========================== */
   function startGame() {
+   if (multipleChoice) {
+    questionPanel.classList.add('mc-mode');
+  } else {
+    questionPanel.classList.remove('mc-mode');
+  }
+  console.log('MC mode?', multipleChoice, questionPanel.classList);
     activeIndex = Number(playerSelect.value || 0);
     activePlayer = players[activeIndex] || players[0];
     activePlayerLabel && (activePlayerLabel.textContent = `${activePlayer.avatar} ${activePlayer.name}`);
