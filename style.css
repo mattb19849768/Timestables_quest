@@ -111,3 +111,67 @@ h1{color:var(--accent);text-shadow:0 0 18px rgba(125,211,252,0.3);margin:6px 0}
     max-width: 90%;
   }
 }
+
+.controls {
+  background: rgba(10, 10, 30, 0.85); /* semi-transparent dark panel */
+  border-radius: 12px;                 /* rounded corners */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5); /* soft shadow */
+  padding: 16px 24px;                  /* inner spacing */
+  display: flex;
+  flex-direction: row;                 /* horizontal buttons */
+  align-items: center;                 /* vertical alignment */
+  justify-content: center;             /* center horizontally */
+  gap: 16px;                           /* spacing between buttons */
+  margin: 24px auto;                   /* center in page with vertical spacing */
+  max-width: 480px;                    /* optional max width */
+  text-align: center;
+  backdrop-filter: blur(4px);          /* optional glassy effect */
+}
+
+/* Buttons inside controls */
+.controls .btn {
+  padding: 10px 18px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.controls .btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* --- Footer --- */
+footer {
+  margin-top: 3rem;
+  color: #ffffff;
+  font-size: 1.0rem;
+  text-align: center;
+  animation: fadeIn 1s ease forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* space between logo and text */
+    background: rgba(10, 10, 30, 0.85); /* semi-transparent dark panel */
+  border-radius: 12px;                 /* rounded corners */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5); /* soft shadow */
+  padding: 16px 24px;                  /* inner spacing */
+  display: flex;
+  flex-direction: row;                 /* horizontal buttons */
+  align-items: center;                 /* vertical alignment */
+  justify-content: center;             /* center horizontally */
+  margin: 24px auto;                   /* center in page with vertical spacing */
+  max-width: 480px;                    /* optional max width */
+  text-align: center;
+  backdrop-filter: blur(4px); 
+}
+
+.footer-logo {
+  width: 20px;      /* tiny size */
+  height: auto;
+  vertical-align: middle;
+}
