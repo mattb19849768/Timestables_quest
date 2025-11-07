@@ -1,154 +1,69 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Space Times Table Adventure</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Neon Tic-Tac-Toe Setup</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Canvases for parallax and effects -->
-  <canvas id="bgCanvas" aria-hidden="true"></canvas>
-  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
-  <canvas id="cometCanvas" aria-hidden="true"></canvas>
+<div class="container">
+  <h1>Neon Tic-Tac-Toe Setup</h1>
 
-  <!-- Home / stats page -->
-  <div id="statPage" class="page">
-    <h1>🚀 Space Times Table Adventure</h1>
+  <label>Player 1 Name</label>
+  <input type="text" id="p1" placeholder="Player 1" value="Player 1">
 
-    <section class="panel" id="playerPanel">
-      <label for="playerSelect">👩‍🚀 Player</label>
-      <select id="playerSelect" style="max-width:240px;"></select>
+  <label>Player 2 Name / Computer</label>
+  <input type="text" id="p2" placeholder="Player 2 / Computer" value="Computer">
 
-      <div class="new-player">
-        <input id="newPlayer" placeholder="New player name" />
-        <div id="avatarPicker" class="avatar-picker" aria-label="Pick avatar"></div>
-        <button id="addPlayerBtn" class="btn">Add</button>
-      </div>
-
-      <div id="totalCoinsDisplay" style="margin-top:6px;font-weight:700;">🪙 Total coins: 0</div>
-    </section>
-
-    <section class="panel" id="modePanel">
-      <div class="modes">
-        <label><input type="radio" name="mode" value="practice" checked> Practice</label>
-        <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
-        <label><input type="radio" name="mode" value="lightspeed"> Lightspeed (1 min)</label>
-      </div>
-      <label class="mc"><input type="checkbox" id="mcToggle"> Multiple choice</label>
-    </section>
-
-    <section class="panel" id="tablePanel">
-      <strong>Select tables</strong>
-      <div id="tableList" class="table-grid" aria-label="Tables"></div>
-    </section>
-
-    <div class="controls">
-      <button id="startBtn" class="btn primary">Start Mission</button>
-      <button id="resetPlayers" class="btn ghost">Reset Players</button>
-    </div>
+  <label>Mode</label>
+  <div class="radio-group" id="modeGroup">
+    <div class="radio selected" data-value="single">Single Player</div>
+    <div class="radio" data-value="two">Two Players</div>
   </div>
 
-  <!-- Game page -->
-  <div id="gamePage" class="page hidden">
-    <div id="topPanel">
-      <div>👩‍🚀 <span id="activePlayerLabel">—</span></div>
-      <div id="questionCounter">Question 0</div>
-      <div>Score: <span id="scoreDisplay">0</span></div>
-      <div>Streak: <span id="streakDisplay">0</span></div>
-      <div>⏱ <span id="timeDisplay">00:00</span></div>
-      <div>🪙 <span id="walletDisplay">0</span></div>
-      <div class="right-controls">
-        <button id="muteBtn" class="btn">🔊</button>
-        <button id="leaderboardBtn" class="btn ghost">Leaderboard</button>
-        <button id="newMissionBtn" class="btn ghost">New Mission</button>
-      </div>
-    </div>
-
-    <main id="questionPanel" class="game-foreground-shield">
-      <div id="questionText" class="question">Prepare for launch…</div>
-      <div id="answersContainer" class="answers" aria-live="polite"></div>
-
-      <div id="typedAnswer" class="typed">
-        <input id="answerInput" inputmode="numeric" placeholder="Answer" />
-        <button id="submitBtn" class="btn">Submit</button>
-      </div>
-
-      <div>Coins earned this mission: <span id="missionCoins">0</span></div>
-
-      <!-- Virtual circular keypad -->
-      <div id="keypad" class="keypad hidden" aria-hidden="true">
-        <div class="key-row">
-          <button class="key">1</button>
-          <button class="key">2</button>
-          <button class="key">3</button>
-        </div>
-        <div class="key-row">
-          <button class="key">4</button>
-          <button class="key">5</button>
-          <button class="key">6</button>
-        </div>
-        <div class="key-row">
-          <button class="key">7</button>
-          <button class="key">8</button>
-          <button class="key">9</button>
-        </div>
-        <div class="key-row">
-          <button class="key back">←</button>
-          <button class="key">0</button>
-          <button class="key check">✓</button>
-        </div>
-      </div>
-
-      <div id="feedback" class="feedback" aria-live="polite"></div>
-    </main>
+  <label>Difficulty</label>
+  <div class="radio-group" id="diffGroup">
+    <div class="radio selected" data-value="normal">Normal</div>
+    <div class="radio" data-value="nightmare">Nightmare</div>
   </div>
 
-  <!-- Countdown overlay -->
-  <div id="countdownOverlay" class="hidden" aria-hidden="true">
-    <div id="countdownText" class="countdown-number">3</div>
-    <svg id="rocketSVG" viewBox="0 0 80 160" width="140" height="280" aria-hidden="true">
-      <defs>
-        <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f0f4ff"/><stop offset="100%" stop-color="#7c6cff"/>
-        </linearGradient>
-        <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#ffd54a"/><stop offset="1" stop-color="#ff7043"/>
-        </linearGradient>
-      </defs>
-      <polygon points="40,4 62,34 18,34" fill="#ff6b6b" />
-      <rect x="22" y="34" width="36" height="92" rx="8" fill="url(#bodyGrad)" />
-      <polygon points="22,126 8,148 22,148" fill="#303030" />
-      <polygon points="58,126 72,148 58,148" fill="#303030" />
-      <circle cx="40" cy="56" r="6" fill="#b8ecff" />
-      <circle cx="40" cy="80" r="6" fill="#b8ecff" />
-      <circle cx="40" cy="104" r="6" fill="#b8ecff" />
-      <polygon id="flame" points="40,130 52,158 40,146 28,158" fill="url(#flameGrad)"/>
-    </svg>
+  <label>Sound Effects</label>
+  <div class="radio-group" id="soundGroup">
+    <div class="radio selected" data-value="on">On</div>
+    <div class="radio" data-value="off">Off</div>
   </div>
+  <a href="https://mattb19849768.github.io/Game-hub/" id="gameHub" class="button" style="text-decoration: none;">Game Hub</a>
+  <button id="startBtn">Start Game</button>
+</div>
 
-  <!-- Leaderboard modal -->
-  <div id="leaderboardModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>🏆 Leaderboard</h2>
-      <ul id="leaderboardList"></ul>
-      <button id="closeLeaderboard" class="btn">Close</button>
-    </div>
-  </div>
+<script>
+function wireGroup(groupId){
+  const group = document.getElementById(groupId);
+  group.addEventListener('click', e=>{
+    const label = e.target.closest('.radio');
+    if(!label) return;
+    group.querySelectorAll('.radio').forEach(l=>l.classList.remove('selected'));
+    label.classList.add('selected');
+  });
+}
+['modeGroup','diffGroup','soundGroup'].forEach(wireGroup);
 
-  <!-- Results modal -->
-  <div id="resultsModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>📜 Results</h2>
-      <div id="resultsSummary"></div>
-      <ul id="resultsList"></ul>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button id="closeResults" class="btn">Close</button>
-        <button id="saveToLeaderboard" class="btn ghost">Save Score</button>
-      </div>
-    </div>
-  </div>
+document.getElementById('startBtn').addEventListener('click',()=>{
+  const p1 = document.getElementById('p1').value || 'Player 1';
+  const p2 = document.getElementById('p2').value || 'Computer';
+  const mode = document.querySelector('#modeGroup .radio.selected').dataset.value;
+  const diff = document.querySelector('#diffGroup .radio.selected').dataset.value;
+  const sound = document.querySelector('#soundGroup .radio.selected').dataset.value;
 
-  <script src="script.js"></script>
+  localStorage.setItem('ttt_p1',p1);
+  localStorage.setItem('ttt_p2',p2);
+  localStorage.setItem('ttt_mode',mode);
+  localStorage.setItem('ttt_diff',diff);
+  localStorage.setItem('ttt_sound',sound);
+
+  window.location.href='game.html';
+});
+</script>
 </body>
 </html>
