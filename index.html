@@ -12,11 +12,14 @@
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
   <canvas id="cometCanvas" aria-hidden="true"></canvas>
 
-  <!-- Home / stats page -->
   <div id="statPage" class="page">
-    <h1>🚀 Space Times Table Adventure</h1>
 
-    <section class="panel" id="playerPanel">
+
+  <!-- Unified panel -->
+  <section class="panel" id="gameSetupPanel">
+    <h1>🚀 Space Times Table Adventure</h1>
+    <!-- Player Selection -->
+    <div id="playerPanel">
       <label for="playerSelect">👩‍🚀 Player</label>
       <select id="playerSelect" style="max-width:240px;"></select>
 
@@ -27,36 +30,61 @@
       </div>
 
       <div id="totalCoinsDisplay" style="margin-top:6px;font-weight:700;">🪙 Total coins: 0</div>
-    </section>
+    </div>
 
-    <section class="panel" id="modePanel">
+    <!-- Game Mode -->
+    <div id="modePanel" style="margin-top:12px;">
       <div class="modes">
         <label><input type="radio" name="mode" value="practice" checked> Practice</label>
         <label><input type="radio" name="mode" value="chaos"> Chaos (50)</label>
         <label><input type="radio" name="mode" value="lightspeed"> Lightspeed (1 min)</label>
       </div>
       <label class="mc"><input type="checkbox" id="mcToggle"> Multiple choice</label>
-    </section>
+    </div>
 
-    <section class="panel" id="tablePanel">
+    <!-- Table Selection -->
+    <div id="tablePanel" style="margin-top:12px;">
       <strong>Select tables</strong>
       <div id="tableList" class="table-grid" aria-label="Tables"></div>
-    </section>
+    </div>
 
-    <div class="controls">
-
-	 <a href="https://mattb19849768.github.io/Game-hub/" class="btn ghost" style="  text-decoration: none;">Game Hub</a>
+    <!-- Controls -->
+    <div class="controls" style="margin-top:16px;">
+      <a href="https://mattb19849768.github.io/Game-hub/" class="btn ghost" style="text-decoration: none;">Game Hub</a>
       <button id="startBtn" class="btn primary">Start Mission</button>
+      <button id="howToBtn" class="btn ghost">How to Play</button>
       <button id="resetPlayers" class="btn ghost">Reset Players</button>
     </div>
-		<footer>
-  <img src="images/logo.png" alt="Game Hub Logo" class="footer-logo" />
-  © 2025 Daddy — Hosted on GitHub Pages
-</footer>
+
+
+  <!-- Footer -->
+  <footer>
+    <img src="images/logo.png" alt="Game Hub Logo" class="footer-logo" />
+    © 2025 Daddy — Hosted on GitHub Pages
+  </footer>
+  </section>
+  <!-- How To Play Modal -->
+  <div id="howToModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>How to Play 🚀</h2>
+      <p>Welcome to Space Times Table Adventure! Here's how to play:</p>
+      <ul>
+        <li>Select a player or create a new one.</li>
+        <li>Choose the multiplication tables you want to practice.</li>
+        <li>Select your game mode: Practice, Chaos, or Lightspeed.</li>
+        <li>Click "Start Mission" to begin the game.</li>
+        <li>Answer the questions as fast and accurately as possible.</li>
+        <li>Use the volume controls and mute buttons for music & SFX.</li>
+      </ul>
+      <button id="closeHowTo" class="btn">Close</button>
+    </div>
   </div>
+</div>
+
 
   <!-- Game page -->
   <div id="gamePage" class="page hidden">
+    <div id="gamePanel">
     <div id="topPanel">
       <div>👩‍🚀 <span id="activePlayerLabel">—</span></div>
       <div id="questionCounter">Question 0</div>
@@ -112,7 +140,7 @@
 	  <canvas id="fireworksCanvas"></canvas>
     </main>
   </div>
-
+</div>
   <!-- Countdown overlay -->
   <div id="countdownOverlay" class="hidden" aria-hidden="true">
     <div id="countdownText" class="countdown-number">3</div>
@@ -157,6 +185,22 @@
       </div>
     </div>
   </div>
+
+<div id="howToModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>How to Play 🚀</h2>
+    <p>Welcome to Space Timestable Adventure! Here's how to play:</p>
+    <ul>
+      <li>Select a player or create a new one.</li>
+      <li>Choose the timestable you want to practice.</li>
+      <li>Select your game mode: Practice, Chaos, or Lightspeed.</li>
+      <li>Click "Start Mission" to begin the game.</li>
+      <li>Answer the questions as fast and accurately as possible.</li>
+      <li>Use the volume controls and mute buttons for music & SFX.</li>
+    </ul>
+    <button id="closeHowTo" class="btn">Close</button>
+  </div>
+</div>
 
   <script src="script.js"></script>
 </body>

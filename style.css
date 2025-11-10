@@ -192,3 +192,162 @@ footer {
   display: none;
   z-index: 1000; /* higher than main panel */
 }
+
+/* Make statPage full height, flex column */
+#statPage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;    /* vertical centering */
+  align-items: center;        /* horizontal centering */
+  min-height: 100vh;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Unified panel for game setup */
+#gameSetupPanel {
+  width: 100%;
+  max-width: 640px;
+  background: rgba(8,10,28,0.82);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* Optional shadow for nice visual */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* Controls wrap nicely in unified panel */
+#gameSetupPanel .controls {
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Footer stays at the bottom */
+footer {
+  margin-top: 24px;
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* Modal stays same as previous version */
+#howToModal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
+
+#howToModal .modal-content {
+  background: rgba(8,10,28,0.82);
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  color: #e6eef8;
+  text-align: left;
+}
+
+#howToModal h2 {
+  color: var(--accent);
+  margin-top: 0;
+}
+
+#howToModal ul {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+#howToModal button {
+  margin-top: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 820px){
+  #gameSetupPanel {
+    max-width: 90%;
+  }
+}
+
+/* Game page: full viewport, center the panel */
+#gamePage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* vertical centering */
+  align-items: center;      /* horizontal centering */
+  min-height: 100vh;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Unified panel containing topPanel + questionPanel */
+#gamePanel {
+  width: 100%;
+  max-width: 640px;
+  background: rgba(8,10,28,0.82);  /* semi-transparent panel */
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;        /* no extra padding around top + question panel */
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* Top panel styling */
+#gamePanel #topPanel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;  /* padding inside topPanel only */
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px 12px 0 0; /* rounded top corners */
+  box-sizing: border-box;
+  font-weight: 700;
+  margin: 0;           /* remove any margin */
+}
+
+/* Question panel inside gamePanel */
+#gamePanel #questionPanel {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical center */
+  align-items: center;       /* horizontal center */
+  text-align: center;
+  width: 100%;
+  min-height: 480px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 0 0 12px 12px; /* rounded bottom corners */
+  padding: 12px;
+  box-sizing: border-box;
+  position: relative; /* for fireworks overlay */
+}
+
+
+/* Footer stays below the panel */
+#gamePage footer {
+  margin-top: 24px;
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 820px) {
+  #gamePanel {
+    max-width: 90%;
+  }
+}
+

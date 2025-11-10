@@ -807,6 +807,26 @@ if (players[activeIndex]) {
 }
 
 
+const howToBtn = document.getElementById('howToBtn');
+const howToModal = document.getElementById('howToModal');
+const closeHowTo = document.getElementById('closeHowTo');
+
+howToBtn.addEventListener('click', () => {
+  howToModal.classList.remove('hidden');
+});
+
+closeHowTo.addEventListener('click', () => {
+  howToModal.classList.add('hidden');
+});
+
+// Optional: close modal on background click
+howToModal.addEventListener('click', (e) => {
+  if(e.target === howToModal){
+    howToModal.classList.add('hidden');
+  }
+});
+
+
   /* ===========================
      New Mission / Back to Menu
   =========================== */
