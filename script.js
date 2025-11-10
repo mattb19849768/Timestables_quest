@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const bg = bgCanvas?.getContext('2d') || null;
   const cometCtx = cometCanvas?.getContext('2d') || null;
   const conf = confettiCanvas?.getContext('2d') || null;
+//const answerInput = document.getElementById('answerInput');
+answerInput.readOnly = true;
 
   /* ===========================
      Resize Canvases
@@ -368,6 +370,17 @@ createMusicToggleUI();
      Questions & Gameplay (continued)
   =========================== */
 
+// Make answerInput readonly only when NOT multiple choice
+function updateAnswerInputReadonly() {
+  if (!answerInput) return;
+  answerInput.readOnly = !multipleChoice;  // true if typed-answer mode
+}
+updateAnswerInputReadonly();
+
+//const submitBtn = document.getElementById('submitBtn');
+if (submitBtn) submitBtn.remove();
+
+
   // Track coins earned this mission separately
   let missionCoins = 0;
 
@@ -543,7 +556,7 @@ createMusicToggleUI();
     }, 420);
   }
 
-  submitBtn?.addEventListener('click', ()=>{ if (answerInput && answerInput.value.trim() !== '') { handleSubmit(answerInput.value.trim()); answerInput.value=''; } });
+  //submitBtn?.addEventListener('click', ()=>{ if (answerInput && answerInput.value.trim() !== '') { handleSubmit(answerInput.value.trim()); answerInput.value=''; } });
   answerInput?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (answerInput && answerInput.value.trim() !== '') { handleSubmit(answerInput.value.trim()); answerInput.value=''; } } });
 
   if (keypad) {
