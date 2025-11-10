@@ -880,4 +880,69 @@ closeLeaderboard?.addEventListener('click', () => {
 console.log('Leaderboard button', leaderboardBtn);
 console.log('Leaderboard modal', leaderboardModal);
 
+//##############
+
+function overlayFireworks(duration = 5000) {
+  const main = document.getElementById('questionPanel');
+  const canvas = document.getElementById('fireworksCanvas');
+  if (!main || !canvas) return;
+
+  // Make sure canvas overlays main content
+  canvas.style.position = 'absolute';
+  canvas.style.top = 0;
+  canvas.style.left = 0;
+  canvas.width = main.offsetWidth;
+  canvas.height = main.offsetHeight;
+  canvas.style.zIndex = 1000;
+  canvas.style.display = 'block';
+
+  // If your fireworks logic already uses this canvas, just trigger it
+  startFireworks(canvas); // <-- your existing function
+
+  // Hide after 5 seconds
+  setTimeout(() => {
+    canvas.style.display = 'none';
+    stopFireworks(canvas); // optional, if your fireworks system has a stop
+  }, duration);
+}
+
+
+//####################
+
+function showFireworksOverlay(duration = 5000) {
+  const main = document.getElementById('questionPanel');
+  const canvas = document.getElementById('confettiCanvas'); // or your fireworks canvas
+  if (!main || !canvas) return;
+
+  // Make canvas overlay the main panel
+  canvas.style.position = 'absolute';
+  canvas.style.top = 0;
+  canvas.style.left = 0;
+  canvas.width = main.offsetWidth;
+  canvas.height = main.offsetHeight;
+  canvas.style.zIndex = 1000;
+  canvas.style.display = 'block';
+  canvas.style.pointerEvents = 'none'; // allows clicks to pass through
+
+  // Start your existing fireworks function
+  startFireworks(canvas); // <-- use your existing fireworks logic
+
+  // Stop and hide after `duration`
+  setTimeout(() => {
+    canvas.style.display = 'none';
+    stopFireworks(canvas); // optional, if your fireworks system has a stop function
+  }, duration);
+}
+
+// Example: call this when the game ends
+function endGame() {
+  // ... your existing end-game logic ...
+  showFireworksOverlay(5000); // show fireworks over main panel for 5s
+}
+
+
+//################
+
+
+
 }); // DOMContentLoaded end
