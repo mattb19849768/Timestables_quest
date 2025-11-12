@@ -142,27 +142,17 @@
   </div>
 </div>
   <!-- Countdown overlay -->
-  <div id="countdownOverlay" class="hidden" aria-hidden="true">
-    <div id="countdownText" class="countdown-number">3</div>
-    <svg id="rocketSVG" viewBox="0 0 80 160" width="140" height="280" aria-hidden="true">
-      <defs>
-        <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f0f4ff"/><stop offset="100%" stop-color="#7c6cff"/>
-        </linearGradient>
-        <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#ffd54a"/><stop offset="1" stop-color="#ff7043"/>
-        </linearGradient>
-      </defs>
-      <polygon points="40,4 62,34 18,34" fill="#ff6b6b" />
-      <rect x="22" y="34" width="36" height="92" rx="8" fill="url(#bodyGrad)" />
-      <polygon points="22,126 8,148 22,148" fill="#303030" />
-      <polygon points="58,126 72,148 58,148" fill="#303030" />
-      <circle cx="40" cy="56" r="6" fill="#b8ecff" />
-      <circle cx="40" cy="80" r="6" fill="#b8ecff" />
-      <circle cx="40" cy="104" r="6" fill="#b8ecff" />
-      <polygon id="flame" points="40,130 52,158 40,146 28,158" fill="url(#flameGrad)"/>
-    </svg>
+<div id="countdownOverlay" class="hidden">
+  <div id="countdownText">3</div>
+  <div id="rocketWrapper">
+    <div id="rocketInner">
+      <img id="rocketImage" src="images/rocket.png" alt="Rocket">
+      <div id="rocketFlames"></div>
+      <div id="rocketTrail"></div>
+    </div>
   </div>
+</div>
+
 
   <!-- Leaderboard modal -->
   <div id="leaderboardModal" class="modal hidden" role="dialog" aria-modal="true">

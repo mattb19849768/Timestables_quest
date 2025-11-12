@@ -572,50 +572,121 @@ if (submitBtn) submitBtn.remove();
     });
   }
 
-  /* ===========================
-     Countdown & Start Sequence
-  =========================== */
-  let countdownRunning = false;
 
-  function startCountdownSequence() {
-    if (countdownRunning) return;
-    countdownRunning = true;
-    countdownOverlay?.classList.remove('hidden');
-    rocketSVG && (rocketSVG.style.transform = 'translateY(0)');
+/* ===========================
+   Countdown & Start Sequence
+=========================== */
 
-    playSfx('countdown');
+let countdownRunning = false;
 
-    let c = 3;
-    countdownText && (countdownText.textContent = String(c));
+function startSequence_playStartThenCountdown() {
+  startBtn && (startBtn.disabled = true, startBtn.classList.add('disabled'));
+  if (bgMusic) { fadeAudio(bgMusic, 0, 300); setTimeout(()=>pauseMusicImmediate(), 350); }
+  playSfx('start');
 
-    const iv = setInterval(() => {
-      c--;
-      if (c > 0) countdownText && (countdownText.textContent = String(c));
-      else if (c === 0) {
-        countdownText && (countdownText.textContent = 'Blast Off!');
-        rocketSVG && (rocketSVG.style.transform = 'translateY(-140%)');
-      } else {
-        clearInterval(iv);
-        setTimeout(() => {
-          countdownOverlay?.classList.add('hidden');
-          rocketSVG && (rocketSVG.style.transform = 'translateY(0)');
-          countdownRunning = false;
-          musicOn && playMusic();
-          startGame();
-        }, 900);
-      }
-    }, 1000);
-  }
-
-  function startSequence_playStartThenCountdown() {
-    startBtn && (startBtn.disabled = true, startBtn.classList.add('disabled'));
-    if (bgMusic) { fadeAudio(bgMusic, 0, 300); setTimeout(()=>pauseMusicImmediate(), 350); }
-    playSfx('start');
+  setTimeout(() => {
+    startCountdownSequence();
     setTimeout(() => {
-      startCountdownSequence();
-      setTimeout(()=>{ startBtn && (startBtn.disabled=false, startBtn.classList.remove('disabled')); }, 4200);
-    }, 2000);
-  }
+      startBtn && (startBtn.disabled = false, startBtn.classList.remove('disabled'));
+    }, 4200);
+  }, 2000);
+}
+
+function startCountdownSequence() {
+  if (countdownRunning) return;
+  countdownRunning = true;
+
+  const overlay = document.getElementById('countdownOverlay');
+  const text = document.getElementById('countdownText');
+  const rocket = document.getElementById('rocketWrapper');
+  const flames = document.getElementById('rocketFlames');
+  const trail = document.getElementById('rocketTrail');
+
+  overlay?.classList.remove('hidden');
+
+  // Reset rocket position + hide flames/trail
+  rocket && (rocket.style.transform = 'scale(0.5) translateY(0)');
+  flames && (flames.style.opacity = 0);
+  trail && (trail.style.opacity = 0);
+
+  // Play your single 3-2-1-Go countdown sound **once**
+  playSfx('countdown');
+
+  let c = 3;
+  text && (text.textContent = String(c));
+
+  const iv = setInterval(() => {
+    c--;
+    if (c > 1) {
+      // Show “2”, soft flame
+      text && (text.textContent = String(c));
+      flames && (flames.style.opacity = 0.5);
+      trail && (trail.style.opacity = 0.3);
+    } else if (c === 1) {
+      // Show “1”, flame stronger
+      text && (text.textContent = '1');
+      flames && (flames.style.opacity = 1);
+      trail && (trail.style.opacity = 0.8);
+    } else {
+      // Launch
+      clearInterval(iv);
+      text && (text.textContent = '');
+
+      // Flame and trail intensify
+      flames && (flames.style.opacity = 1);
+      trail && (trail.style.opacity = 1);
+
+      // Rocket lift-off
+      rocket && (
+        rocket.style.transition = 'transform 1.25s cubic-bezier(.12,.9,.28,1)',
+        rocket.style.transform = 'scale(0.5) translateY(-150vh)'
+      );
+
+      // Rocket sound
+      playSfx('rocketLaunch');
+
+      // After launch
+      setTimeout(() => {
+        overlay?.classList.add('hidden');
+        rocket && (
+          rocket.style.transition = '',
+          rocket.style.transform = 'scale(0.5) translateY(0)'
+        );
+        flames && (flames.style.opacity = 0);
+        trail && (trail.style.opacity = 0);
+        countdownRunning = false;
+        musicOn && playMusic();
+        startGame();
+      }, 1400);
+    }
+  }, 1000);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   /* ===========================
      Start button wiring
